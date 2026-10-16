@@ -1,9 +1,10 @@
 {% extends 'base.html' %}
 
 {% block content %}
+<!-- Filtros y Botón de Marcación Manual -->
 <div class="card shadow-sm mb-4">
     <div class="card-body bg-white rounded">
-        <form method="GET" action="/" class="row g-3 align-items-end">
+        <form method="GET" action="/" class="row g-3 align-items-end mb-3">
             <div class="col-md-4">
                 <label class="form-label fw-bold">Colaborador</label>
                 <select name="emp_id" class="form-select">
@@ -28,9 +29,61 @@
                 <a href="/" class="btn btn-outline-secondary">Limpiar</a>
             </div>
         </form>
+        <hr class="my-2">
+        <div class="d-flex justify-content-between align-items-center pt-2">
+            <span class="text-muted small">¿Un colaborador olvidó marcar o requiere ajuste?</span>
+            <button type="button" class="btn btn-sm btn-outline-success fw-bold" data-bs-toggle="modal" data-bs-target="#modalAjusteManual">
+                ➕ Registrar Marcación Manual
+            </button>
+        </div>
     </div>
 </div>
 
+<!-- Modal para Marcación Manual / Nueva -->
+<div class="modal fade text-start" id="modalAjusteManual" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <form method="POST" action="/marcaciones/guardar_ajuste">
+                <div class="modal-header card-header-custom">
+                    <h5 class="modal-title">Registrar / Ajustar Marcación Manual</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Colaborador</label>
+                        <select name="emp_id" class="form-select" required>
+                            <option value="">Seleccione colaborador...</option>
+                            {% for code, info in empleados.items() %}
+                                <option value="{{ code }}">{{ code }} - {{ info.nombre }} {{ info.apellido }} ({{ info.area }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Fecha</label>
+                        <input type="date" name="fecha" class="form-control" required>
+                    </div>
+                    <div class="row">
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">Hora Entrada</label>
+                            <input type="time" step="1" name="hora_entrada" class="form-control">
+                        </div>
+                        <div class="col-6 mb-3">
+                            <label class="form-label fw-bold">Hora Salida</label>
+                            <input type="time" step="1" name="hora_salida" class="form-control">
+                        </div>
+                    </div>
+                    <small class="text-muted">Puede ingresar una o ambas horas. Si ya existía una marca ese día, se actualizará.</small>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    <button type="submit" class="btn btn-custom">Guardar Marcación</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla de Horas Totales -->
 <div class="card shadow-sm">
     <div class="card-header card-header-custom d-flex justify-content-between align-items-center">
         <h5 class="mb-0">Horas Totales Trabajadas</h5>
@@ -50,6 +103,7 @@
                         <th>Entrada</th>
                         <th>Salida</th>
                         <th>Horas Trabajadas</th>
+                        <th class="text-center">Acción</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -68,9 +122,52 @@
                                 <strong>{{ m.horas_totales }} h</strong>
                             {% endif %}
                         </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalAjusteFila{{ loop.index }}">
+                                ✏️ Ajustar
+                            </button>
+
+                            <!-- Modal de Ajuste para esta Fila -->
+                            <div class="modal fade text-start" id="modalAjusteFila{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="POST" action="/marcaciones/guardar_ajuste">
+                                            <input type="hidden" name="emp_id" value="{{ m.id }}">
+                                            <input type="hidden" name="fecha" value="{{ m.fecha }}">
+                                            <div class="modal-header card-header-custom">
+                                                <h5 class="modal-title">Ajustar Horario: {{ m.nombre }}</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <p class="mb-3">
+                                                    <strong>Colaborador:</strong> {{ m.nombre }} (<code>{{ m.id }}</code>)<br>
+                                                    <strong>Fecha:</strong> {{ m.fecha }}
+                                                </p>
+                                                <div class="row">
+                                                    <div class="col-6 mb-3">
+                                                        <label class="form-label fw-bold">Hora Entrada</label>
+                                                        <input type="time" step="1" name="hora_entrada" class="form-control" value="{{ m.entrada if m.entrada else '' }}">
+                                                    </div>
+                                                    <div class="col-6 mb-3">
+                                                        <label class="form-label fw-bold">Hora Salida</label>
+                                                        <input type="time" step="1" name="hora_salida" class="form-control" value="{{ m.salida if m.salida else '' }}">
+                                                    </div>
+                                                </div>
+                                                <small class="text-muted">Los cambios sustituirán las marcas registradas de este día.</small>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-custom">Guardar Ajuste</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </td>
                     </tr>
                     {% else %}
-                    <tr><td colspan="7" class="text-center py-4 text-muted">No hay registros con los filtros seleccionados.</td></tr>
+                    <tr><td colspan="8" class="text-center py-4 text-muted">No hay registros con los filtros seleccionados.</td></tr>
                     {% endfor %}
                 </tbody>
             </table>

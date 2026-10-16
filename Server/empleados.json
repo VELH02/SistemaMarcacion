@@ -2,11 +2,20 @@
     "EMP-001": {
         "nombre": "Pedro",
         "apellido": "Martinez",
-        "area": "OPERACIONES"
+        "area": "OPERACIONES",
+        "rfid": ""
     },
     "EMP-002": {
         "nombre": "Maria",
         "apellido": "Gomez",
-        "area": "MANTENIMIENTO"
+        "area": "MANTENIMIENTO",
+        "rfid": ""
+    },
+    "14244": {
+        "nombre": "Edwin",
+        "apellido": "Aponte",
+        "area": "MANTENIMIENTO",
+        "rfid": "",
+        "vector_facial": []
     }
 }

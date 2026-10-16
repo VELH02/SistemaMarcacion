@@ -1,6 +1,8 @@
 import csv
 import json
 import os
+import uuid
+import numpy as np
 from datetime import datetime
 from config import DATA_FILE, CONFIG_FILE, EMPLEADOS_FILE, AREAS_FILE, USUARIOS_FILE, BIOMETRIA_FOLDER
 import time_sync
@@ -12,8 +14,20 @@ DEFAULT_CONFIG = {
 }
 
 DEFAULT_EMPLEADOS = {
-    "EMP-001": {"nombre": "Pedro", "apellido": "Martinez", "area": "OPERACIONES"},
-    "EMP-002": {"nombre": "Maria", "apellido": "Gomez", "area": "MANTENIMIENTO"}
+    "EMP-001": {
+        "nombre": "Pedro", 
+        "apellido": "Martinez", 
+        "area": "OPERACIONES", 
+        "rfid": "0012938471", 
+        "vector_facial": []
+    },
+    "EMP-002": {
+        "nombre": "Maria", 
+        "apellido": "Gomez", 
+        "area": "MANTENIMIENTO", 
+        "rfid": "0012938472", 
+        "vector_facial": []
+    }
 }
 
 DEFAULT_AREAS = [
@@ -34,6 +48,7 @@ DEFAULT_USUARIOS = {
 }
 
 def init_files():
+    """Inicializa archivos base y migra matrices .npy existentes dentro de empleados.json"""
     os.makedirs(BIOMETRIA_FOLDER, exist_ok=True)
 
     if not os.path.exists(CONFIG_FILE) or os.path.getsize(CONFIG_FILE) == 0:
@@ -53,7 +68,25 @@ def init_files():
             writer = csv.writer(f)
             writer.writerow(["ID_Registro", "ID_Personal", "Nombre", "Area", "Tipo", "Fecha_Hora", "IP_Origen", "Estado", "Nota"])
 
-    # Intentar sincronizar hora inicial por NTP
+    # Migración automática: integrar matrices .npy sueltas hacia empleados.json
+    empleados = load_json(EMPLEADOS_FILE)
+    cambios = False
+    for emp_id, emp_data in empleados.items():
+        if "rfid" not in emp_data:
+            emp_data["rfid"] = ""
+            cambios = True
+        if "vector_facial" not in emp_data or len(emp_data["vector_facial"]) == 0:
+            ruta_npy = os.path.join(BIOMETRIA_FOLDER, f"{emp_id}.npy")
+            if os.path.exists(ruta_npy):
+                try:
+                    matriz = np.load(ruta_npy)
+                    emp_data["vector_facial"] = matriz.tolist()
+                    cambios = True
+                except Exception:
+                    pass
+    if cambios:
+        save_json(EMPLEADOS_FILE, empleados)
+
     cfg = load_json(CONFIG_FILE)
     ntp_host = cfg.get("servidor_ntp", "pool.ntp.org")
     time_sync.sincronizar_ntp(ntp_host)
@@ -95,6 +128,141 @@ def load_json(file_path):
 def save_json(file_path, data):
     with open(file_path, 'w', encoding='utf-8') as f:
         json.dump(data, f, indent=4, ensure_ascii=False)
+
+def buscar_empleado_por_id_o_rfid(identificador):
+    """Busca al colaborador por su código de empleado o por su tarjeta RFID"""
+    empleados = load_json(EMPLEADOS_FILE)
+    identificador_limpio = str(identificador).strip().upper()
+
+    # Búsqueda directa por ID
+    if identificador_limpio in empleados:
+        return identificador_limpio, empleados[identificador_limpio]
+
+    # Búsqueda por código de tarjeta RFID
+    for code, info in empleados.items():
+        if info.get('rfid', '').strip().upper() == identificador_limpio:
+            return code, info
+
+    return None, None
+
+def actualizar_codigo_empleado_sistema(codigo_viejo, codigo_nuevo, nuevo_nombre, nuevo_apellido, nueva_area, nuevo_rfid, nuevo_vector=None):
+    """Actualiza los datos consolidados del colaborador en empleados.json y en marcaciones.csv"""
+    empleados = load_json(EMPLEADOS_FILE)
+    codigo_viejo = str(codigo_viejo).strip().upper()
+    codigo_nuevo = str(codigo_nuevo).strip().upper()
+
+    datos_anteriores = empleados.get(codigo_viejo, {})
+    vector_conservado = nuevo_vector if nuevo_vector is not None else datos_anteriores.get("vector_facial", [])
+
+    if codigo_viejo in empleados:
+        del empleados[codigo_viejo]
+    
+    empleados[codigo_nuevo] = {
+        "nombre": nuevo_nombre,
+        "apellido": nuevo_apellido,
+        "area": nueva_area,
+        "rfid": nuevo_rfid,
+        "vector_facial": vector_conservado
+    }
+    save_json(EMPLEADOS_FILE, empleados)
+
+    # Actualizar histórico en marcaciones.csv si el ID cambió
+    if os.path.exists(DATA_FILE) and os.path.getsize(DATA_FILE) > 0 and codigo_viejo != codigo_nuevo:
+        filas_actualizadas = []
+        nombre_completo = f"{nuevo_nombre} {nuevo_apellido}".strip()
+        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            fieldnames = reader.fieldnames or ["ID_Registro", "ID_Personal", "Nombre", "Area", "Tipo", "Fecha_Hora", "IP_Origen", "Estado", "Nota"]
+            for row in reader:
+                if row.get('ID_Personal', '').strip().upper() == codigo_viejo:
+                    row['ID_Personal'] = codigo_nuevo
+                    row['Nombre'] = nombre_completo
+                    row['Area'] = nueva_area
+                filas_actualizadas.append(row)
+        
+        with open(DATA_FILE, 'w', newline='', encoding='utf-8') as f:
+            writer = csv.DictWriter(f, fieldnames=fieldnames)
+            writer.writeheader()
+            writer.writerows(filas_actualizadas)
+
+def guardar_o_actualizar_marcacion_diaria(emp_id, fecha, hora_entrada, hora_salida, usuario_modifica):
+    emp_id = str(emp_id).strip().upper()
+    empleados = load_json(EMPLEADOS_FILE)
+    emp_info = empleados.get(emp_id, {"nombre": f"Colaborador {emp_id}", "apellido": "", "area": "OPERACIONES"})
+    nombre_completo = f"{emp_info.get('nombre', '')} {emp_info.get('apellido', '')}".strip()
+    area = emp_info.get('area', 'OPERACIONES').strip().upper()
+
+    filas = []
+    entrada_encontrada = False
+    salida_encontrada = False
+
+    def formatear_hora(h):
+        h = h.strip()
+        if not h: return ""
+        partes = h.split(':')
+        if len(partes) == 2:
+            return f"{partes[0].zfill(2)}:{partes[1].zfill(2)}:00"
+        elif len(partes) == 3:
+            return f"{partes[0].zfill(2)}:{partes[1].zfill(2)}:{partes[2].zfill(2)}"
+        return h
+
+    h_in = formatear_hora(hora_entrada)
+    h_out = formatear_hora(hora_salida)
+
+    fieldnames = ["ID_Registro", "ID_Personal", "Nombre", "Area", "Tipo", "Fecha_Hora", "IP_Origen", "Estado", "Nota"]
+
+    if os.path.exists(DATA_FILE) and os.path.getsize(DATA_FILE) > 0:
+        with open(DATA_FILE, 'r', encoding='utf-8') as f:
+            reader = csv.DictReader(f)
+            fieldnames = reader.fieldnames or fieldnames
+            for row in reader:
+                r_id = row.get('ID_Personal', '').strip().upper()
+                r_fh = row.get('Fecha_Hora', '').strip()
+                r_fecha = r_fh.split(' ')[0] if ' ' in r_fh else ""
+                r_tipo = row.get('Tipo', '').strip().upper()
+
+                if r_id == emp_id and r_fecha == fecha:
+                    if r_tipo == 'ENTRADA' and h_in:
+                        row['Fecha_Hora'] = f"{fecha} {h_in}"
+                        row['Nota'] = f"Modificado por {usuario_modifica}"
+                        entrada_encontrada = True
+                    elif r_tipo in ['SALIDA', 'TIEMPO EXTRA'] and h_out:
+                        row['Fecha_Hora'] = f"{fecha} {h_out}"
+                        row['Nota'] = f"Modificado por {usuario_modifica}"
+                        salida_encontrada = True
+                
+                filas.append(row)
+
+    if h_in and not entrada_encontrada:
+        filas.append({
+            "ID_Registro": uuid.uuid4().hex[:8],
+            "ID_Personal": emp_id,
+            "Nombre": nombre_completo,
+            "Area": area,
+            "Tipo": "ENTRADA",
+            "Fecha_Hora": f"{fecha} {h_in}",
+            "IP_Origen": "Ajuste Manual",
+            "Estado": "Aprobado",
+            "Nota": f"Añadido por {usuario_modifica}"
+        })
+
+    if h_out and not salida_encontrada:
+        filas.append({
+            "ID_Registro": uuid.uuid4().hex[:8],
+            "ID_Personal": emp_id,
+            "Nombre": nombre_completo,
+            "Area": area,
+            "Tipo": "SALIDA",
+            "Fecha_Hora": f"{fecha} {h_out}",
+            "IP_Origen": "Ajuste Manual",
+            "Estado": "Aprobado",
+            "Nota": f"Añadido por {usuario_modifica}"
+        })
+
+    with open(DATA_FILE, 'w', newline='', encoding='utf-8') as f:
+        writer = csv.DictWriter(f, fieldnames=fieldnames)
+        writer.writeheader()
+        writer.writerows(filas)
 
 def obtener_registros_agrupados(area_usuario, emp_id_filtro, fecha_inicio, fecha_fin):
     registros_diarios = {}
@@ -183,11 +351,11 @@ def obtener_historial_empleado(emp_id):
 
                 tipo_m = row.get('Tipo', '').strip().upper()
                 if tipo_m == 'ENTRADA':
-                    if not registros_diarios[key]['entrada'] or hora_str < registros_diarios[key]['entrada']:
-                        registros_diarios[key]['entrada'] = hora_str
+                    if not registros_diarios[fecha_str]['entrada'] or hora_str < registros_diarios[fecha_str]['entrada']:
+                        registros_diarios[fecha_str]['entrada'] = hora_str
                 elif tipo_m in ['SALIDA', 'TIEMPO EXTRA']:
-                    if not registros_diarios[key]['salida'] or hora_str > registros_diarios[key]['salida']:
-                        registros_diarios[key]['salida'] = hora_str
+                    if not registros_diarios[fecha_str]['salida'] or hora_str > registros_diarios[fecha_str]['salida']:
+                        registros_diarios[fecha_str]['salida'] = hora_str
 
     historial = []
     for fecha, horas in sorted(registros_diarios.items(), reverse=True):

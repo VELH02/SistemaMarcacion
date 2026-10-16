@@ -23,6 +23,11 @@
                         <input type="text" name="apellido" class="form-control" required>
                     </div>
                     <div class="mb-3">
+                        <label class="form-label fw-bold">Tarjeta RFID (Carnet)</label>
+                        <input type="text" name="rfid" class="form-control" placeholder="Ej: 0012345678">
+                        <small class="text-muted">Código impreso o leído del carnet físico.</small>
+                    </div>
+                    <div class="mb-3">
                         <label class="form-label fw-bold">Área Asignada</label>
                         <select name="area" class="form-select" required>
                             {% for a in areas %}
@@ -35,7 +40,7 @@
                     <div class="mb-4">
                         <label class="form-label fw-bold">Archivo Biométrico (.npy)</label>
                         <input type="file" name="archivo_npy" class="form-control" accept=".npy">
-                        <small class="text-muted">Se sincronizará con los terminales biométricos.</small>
+                        <small class="text-muted">La matriz facial se consolidará directamente en JSON.</small>
                     </div>
                     <button type="submit" class="btn btn-custom w-100">Registrar Colaborador</button>
                 </form>
@@ -57,6 +62,8 @@
                                 <th>Código</th>
                                 <th>Nombre Completo</th>
                                 <th>Área</th>
+                                <th>Tarjeta RFID</th>
+                                <th class="text-center">Biometría</th>
                                 <th class="text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -66,6 +73,20 @@
                                 <td><code>{{ code }}</code></td>
                                 <td><strong>{{ emp.nombre }} {{ emp.apellido }}</strong></td>
                                 <td><span class="badge bg-secondary">{{ emp.area }}</span></td>
+                                <td>
+                                    {% if emp.rfid %}
+                                        <code class="text-dark bg-light px-2 py-1 rounded border">{{ emp.rfid }}</code>
+                                    {% else %}
+                                        <span class="text-muted small">Sin asignar</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if emp.vector_facial and emp.vector_facial | length > 0 %}
+                                        <span class="badge bg-success" title="Matriz facial consolidada en JSON">✓ Registrada</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">Pendiente</span>
+                                    {% endif %}
+                                </td>
                                 <td class="text-center">
                                     <div class="d-inline-flex gap-1">
                                         <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar{{ code }}">
@@ -87,8 +108,9 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <div class="mb-3">
-                                                            <label class="form-label fw-bold">Código (ID)</label>
-                                                            <input type="text" class="form-control" value="{{ code }}" disabled readonly>
+                                                            <label class="form-label fw-bold">Código del Colaborador (ID)</label>
+                                                            <input type="text" name="nuevo_emp_id" class="form-control" value="{{ code }}" required>
+                                                            <small class="text-muted">Si modifica el código, su histórico se actualizará automáticamente.</small>
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label fw-bold">Nombre</label>
@@ -97,6 +119,10 @@
                                                         <div class="mb-3">
                                                             <label class="form-label fw-bold">Apellido</label>
                                                             <input type="text" name="apellido" class="form-control" value="{{ emp.apellido }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Tarjeta RFID (Carnet)</label>
+                                                            <input type="text" name="rfid" class="form-control" value="{{ emp.rfid | default('') }}" placeholder="Ej: 0012345678">
                                                         </div>
                                                         <div class="mb-3">
                                                             <label class="form-label fw-bold">Área</label>
@@ -109,9 +135,9 @@
                                                             </select>
                                                         </div>
                                                         <div class="mb-3">
-                                                            <label class="form-label fw-bold">Actualizar Archivo Biométrico (.npy)</label>
+                                                            <label class="form-label fw-bold">Actualizar Matriz Facial (.npy)</label>
                                                             <input type="file" name="archivo_npy" class="form-control" accept=".npy">
-                                                            <small class="text-muted">Dejar vacío si desea conservar la biometría actual.</small>
+                                                            <small class="text-muted">Dejar vacío para conservar los datos biométricos actuales.</small>
                                                         </div>
                                                     </div>
                                                     <div class="modal-footer">
@@ -134,7 +160,7 @@
                                                     </div>
                                                     <div class="modal-body">
                                                         <p>¿Está seguro de que desea eliminar al colaborador <strong>{{ emp.nombre }} {{ emp.apellido }}</strong> (<code>{{ code }}</code>)?</p>
-                                                        <p class="text-danger small mb-0">Esta acción removerá sus registros del sistema y su archivo biométrico (.npy) del servidor.</p>
+                                                        <p class="text-danger small mb-0">Esta acción removerá su ficha de personal y sus datos biométricos consolidados.</p>
                                                     </div>
                                                     <div class="modal-footer">
                                                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
@@ -148,7 +174,7 @@
                                 </td>
                             </tr>
                             {% else %}
-                            <tr><td colspan="4" class="text-center py-4 text-muted">No hay colaboradores registrados en esta área.</td></tr>
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No hay colaboradores registrados en esta área.</td></tr>
                             {% endfor %}
                         </tbody>
                     </table>

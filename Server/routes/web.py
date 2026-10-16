@@ -1,9 +1,12 @@
 import os
 from functools import wraps
 from flask import Blueprint, render_template, request, redirect, url_for, session, flash, Response
-from werkzeug.utils import secure_filename
-from config import EMPLEADOS_FILE, CONFIG_FILE, AREAS_FILE, USUARIOS_FILE, BIOMETRIA_FOLDER
-from storage import load_json, save_json, obtener_registros_agrupados
+import numpy as np
+from config import EMPLEADOS_FILE, CONFIG_FILE, AREAS_FILE, USUARIOS_FILE
+from storage import (
+    load_json, save_json, obtener_registros_agrupados, 
+    actualizar_codigo_empleado_sistema, guardar_o_actualizar_marcacion_diaria
+)
 from logger import log_event
 
 web_bp = Blueprint('web', __name__)
@@ -51,7 +54,7 @@ def logout():
     return redirect(url_for('web.login'))
 
 # ==========================================
-# ASISTENCIAS
+# ASISTENCIAS Y AJUSTE MANUAL DE HORAS
 # ==========================================
 
 @web_bp.route('/')
@@ -73,6 +76,41 @@ def index():
 
     marcaciones = obtener_registros_agrupados(area_usuario, emp_id, f_inicio, f_fin)
     return render_template('index.html', marcaciones=marcaciones, area=area_usuario, empleados=empleados_area, emp_id_filtro=emp_id, fecha_inicio=f_inicio, fecha_fin=f_fin)
+
+@web_bp.route('/marcaciones/guardar_ajuste', methods=['POST'])
+@login_required
+def guardar_ajuste_marcacion():
+    area_usuario = session.get('area', 'TODAS').upper()
+    usr_area = area_usuario.strip().upper().replace("Í", "I")
+
+    emp_id = request.form.get('emp_id', '').strip().upper()
+    fecha = request.form.get('fecha', '').strip()
+    hora_entrada = request.form.get('hora_entrada', '').strip()
+    hora_salida = request.form.get('hora_salida', '').strip()
+
+    empleados = load_json(EMPLEADOS_FILE)
+    if emp_id not in empleados:
+        flash('Colaborador no encontrado.', 'danger')
+        return redirect(url_for('web.index'))
+
+    emp_area = empleados[emp_id].get('area', '').strip().upper().replace("Í", "I")
+    if usr_area != 'TODAS' and emp_area != usr_area:
+        flash('No tienes permiso para modificar marcaciones de otra área.', 'danger')
+        return redirect(url_for('web.index'))
+
+    if not fecha:
+        flash('Debe seleccionar una fecha.', 'danger')
+        return redirect(url_for('web.index'))
+
+    if not hora_entrada and not hora_salida:
+        flash('Debe especificar al menos una hora (entrada o salida).', 'warning')
+        return redirect(url_for('web.index'))
+
+    usuario_actual = session.get('usuario', 'Admin')
+    guardar_o_actualizar_marcacion_diaria(emp_id, fecha, hora_entrada, hora_salida, usuario_actual)
+    log_event("Local", f"Marcación ajustada para {emp_id} el día {fecha} por {usuario_actual}")
+    flash(f'Marcación del colaborador {emp_id} para el día {fecha} guardada correctamente.', 'success')
+    return redirect(url_for('web.index'))
 
 @web_bp.route('/exportar')
 @login_required
@@ -113,21 +151,34 @@ def gestion_colaboradores():
         emp_id = request.form.get('emp_id', '').strip().upper()
         nombre = request.form.get('nombre', '').strip()
         apellido = request.form.get('apellido', '').strip()
+        rfid = request.form.get('rfid', '').strip().upper()
 
         if not emp_id or not nombre:
             flash('El código y el nombre son obligatorios.', 'danger')
             return redirect(url_for('web.gestion_colaboradores'))
 
+        if emp_id in empleados:
+            flash(f'El código {emp_id} ya se encuentra registrado para otro colaborador.', 'danger')
+            return redirect(url_for('web.gestion_colaboradores'))
+
+        # Procesar archivo .npy y convertir la matriz a lista JSON directamente
+        vector_facial = []
         archivo_npy = request.files.get('archivo_npy')
         if archivo_npy and archivo_npy.filename.endswith('.npy'):
-            filename = secure_filename(f"{emp_id}.npy")
-            archivo_npy.save(os.path.join(BIOMETRIA_FOLDER, filename))
-            log_event("Local", f"Archivo biométrico guardado para {emp_id}")
+            try:
+                archivo_npy.seek(0)
+                matriz = np.load(archivo_npy)
+                vector_facial = matriz.tolist()
+                log_event("Local", f"Vector biométrico integrado en JSON para {emp_id}")
+            except Exception as e:
+                flash(f'No se pudo leer la matriz del archivo .npy: {e}', 'warning')
 
         empleados[emp_id] = {
             "nombre": nombre,
             "apellido": apellido,
-            "area": area_form
+            "area": area_form,
+            "rfid": rfid,
+            "vector_facial": vector_facial
         }
         save_json(EMPLEADOS_FILE, empleados)
         log_event("Local", f"Colaborador {emp_id} ({nombre} {apellido}) creado por {session.get('usuario')}.")
@@ -152,24 +203,39 @@ def editar_colaborador(emp_id):
             flash('No tienes permiso para modificar colaboradores de otra área.', 'danger')
             return redirect(url_for('web.gestion_colaboradores'))
 
+        nuevo_codigo = request.form.get('nuevo_emp_id', emp_id).strip().upper()
+        nombre = request.form.get('nombre', '').strip()
+        apellido = request.form.get('apellido', '').strip()
+        rfid = request.form.get('rfid', '').strip().upper()
         nueva_area = request.form.get('area', colab_area_actual).strip().upper().replace("Í", "I")
+
+        if not nuevo_codigo or not nombre:
+            flash('El código y el nombre no pueden quedar vacíos.', 'danger')
+            return redirect(url_for('web.gestion_colaboradores'))
+
+        if nuevo_codigo != emp_id and nuevo_codigo in empleados:
+            flash(f'El código "{nuevo_codigo}" ya está asignado a otro colaborador.', 'danger')
+            return redirect(url_for('web.gestion_colaboradores'))
+
         if usr_area != 'TODAS' and nueva_area != usr_area:
             flash('No puedes reasignar un colaborador fuera de tu área.', 'danger')
             return redirect(url_for('web.gestion_colaboradores'))
 
-        empleados[emp_id]['nombre'] = request.form.get('nombre', '').strip()
-        empleados[emp_id]['apellido'] = request.form.get('apellido', '').strip()
-        empleados[emp_id]['area'] = nueva_area
-        
+        # Si sube nueva biometría, convertir la matriz a lista
+        nuevo_vector = None
         archivo_npy = request.files.get('archivo_npy')
         if archivo_npy and archivo_npy.filename.endswith('.npy'):
-            filename = secure_filename(f"{emp_id}.npy")
-            archivo_npy.save(os.path.join(BIOMETRIA_FOLDER, filename))
-            log_event("Local", f"Biometría actualizada para {emp_id}")
+            try:
+                archivo_npy.seek(0)
+                matriz = np.load(archivo_npy)
+                nuevo_vector = matriz.tolist()
+                log_event("Local", f"Vector biométrico actualizado en JSON para {nuevo_codigo}")
+            except Exception as e:
+                flash(f'Error al procesar archivo .npy: {e}', 'warning')
 
-        save_json(EMPLEADOS_FILE, empleados)
-        log_event("Local", f"Colaborador {emp_id} editado exitosamente.")
-        flash(f'Colaborador {emp_id} actualizado correctamente.', 'success')
+        actualizar_codigo_empleado_sistema(emp_id, nuevo_codigo, nombre, apellido, nueva_area, rfid, nuevo_vector)
+        log_event("Local", f"Colaborador {emp_id} actualizado (Código final: {nuevo_codigo}).")
+        flash(f'Colaborador {nuevo_codigo} actualizado correctamente.', 'success')
     else:
         flash('Colaborador no encontrado.', 'danger')
 
@@ -196,15 +262,6 @@ def eliminar_colaborador(emp_id):
     nombre_completo = f"{empleados[emp_id].get('nombre', '')} {empleados[emp_id].get('apellido', '')}".strip()
     del empleados[emp_id]
     save_json(EMPLEADOS_FILE, empleados)
-
-    # Eliminar archivo biométrico (.npy) si existe
-    ruta_npy = os.path.join(BIOMETRIA_FOLDER, f"{emp_id}.npy")
-    if os.path.exists(ruta_npy):
-        try:
-            os.remove(ruta_npy)
-            log_event("Local", f"Biometría {emp_id}.npy eliminada del disco.")
-        except Exception as e:
-            log_event("Local", f"Error eliminando biometría de {emp_id}: {e}")
 
     log_event("Local", f"Colaborador {emp_id} ({nombre_completo}) eliminado por {session.get('usuario')}.")
     flash(f'Colaborador {emp_id} ({nombre_completo}) eliminado permanentemente.', 'success')
@@ -267,13 +324,11 @@ def editar_area(area_actual):
         areas[idx] = nuevo_nombre
         save_json(AREAS_FILE, sorted(areas))
 
-        # Actualización en cascada para colaboradores
         for emp in empleados.values():
             if emp.get('area', '').strip().upper().replace("Í", "I") == area_actual:
                 emp['area'] = nuevo_nombre
         save_json(EMPLEADOS_FILE, empleados)
 
-        # Actualización en cascada para usuarios asignados
         for u in usuarios.values():
             if u.get('area', '').strip().upper().replace("Í", "I") == area_actual:
                 u['area'] = nuevo_nombre
@@ -292,7 +347,6 @@ def eliminar_area(area_nombre):
     empleados = load_json(EMPLEADOS_FILE)
     area_nombre = area_nombre.strip().upper().replace("Í", "I")
 
-    # Validación: no permitir borrar áreas que contengan colaboradores
     tiene_empleados = any(e.get('area', '').strip().upper().replace("Í", "I") == area_nombre for e in empleados.values())
     if tiene_empleados:
         flash(f'No se puede eliminar el área {area_nombre} porque tiene colaboradores asignados. Reasígnalos primero.', 'danger')
@@ -427,7 +481,6 @@ def configuracion():
             "servidor_ntp": servidor_ntp
         })
         
-        # Intentar sincronizar con el nuevo servidor configurado
         time_sync.sincronizar_ntp(servidor_ntp)
         log_event("Local", f"Configuración guardada. Servidor NTP asignado: {servidor_ntp}")
         flash('Configuración y servidor de tiempo actualizados.', 'success')
