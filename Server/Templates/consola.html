@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm border-0">
+    <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center rounded-top">
+        <h5 class="mb-0">📡 Consola de Monitorización en Tiempo Real</h5>
+        <div class="d-flex align-items-center">
+            <span class="spinner-grow spinner-grow-sm text-success me-2" role="status"></span>
+            <span class="badge bg-success">Escuchando Tráfico</span>
+        </div>
+    </div>
+    
+    <div class="card-body bg-black p-0 rounded-bottom">
+        <div id="terminal" style="height: 65vh; overflow-y: auto; padding: 20px; font-family: 'Courier New', Courier, monospace; color: #00ff00; font-size: 14px; background-color: #0c0c0c;">
+            Iniciando conexión con el servidor interno...<br>
+        </div>
+    </div>
+</div>
+
+<script>
+    const terminal = document.getElementById('terminal');
+
+    function fetchLogs() {
+        fetch('/api/logs')
+            .then(response => response.json())
+            .then(logs => {
+                terminal.innerHTML = logs.map(log => `<div>${log}</div>`).join('');
+                terminal.scrollTop = terminal.scrollHeight;
+            })
+            .catch(err => {
+                terminal.innerHTML += `<div style="color: red;">[!] Error de conexión con el servidor.</div>`;
+            });
+    }
+
+    setInterval(fetchLogs, 1500);
+    fetchLogs();
+</script>
+{% endblock %}

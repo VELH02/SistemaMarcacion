@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Formulario para crear Usuario -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Nuevo Usuario Administrador</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/usuarios">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuario (Login)</label>
+                        <input type="text" name="usuario" class="form-control" placeholder="Ej: gestion, rrhh" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Encargado</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Jefe de Gestión" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Área Asignada</label>
+                        <select name="area" class="form-select" required>
+                            <option value="TODAS">TODAS (Administrador Global)</option>
+                            {% for a in areas %}
+                                <option value="{{ a }}">{{ a }}</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100">Crear Usuario</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Usuarios -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Usuarios Registrados</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Nombre</th>
+                                <th>Área Asignada</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for u_key, u_val in usuarios.items() %}
+                            <tr>
+                                <td><code>{{ u_key }}</code></td>
+                                <td><strong>{{ u_val.nombre }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ u_val.area }}</span></td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1">
+                                        <!-- Botón Reset Password -->
+                                        <button type="button" class="btn btn-sm btn-outline-warning" data-bs-toggle="modal" data-bs-target="#modalPass{{ loop.index }}">
+                                            🔑 Password
+                                        </button>
+
+                                        {% if u_key != 'admin' %}
+                                        <!-- Botón Eliminar -->
+                                        <form method="POST" action="/admin/usuarios/eliminar/{{ u_key }}" onsubmit="return confirm('¿Seguro que desea eliminar al usuario {{ u_key }}?');">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger">
+                                                🗑️ Eliminar
+                                            </button>
+                                        </form>
+                                        {% endif %}
+                                    </div>
+
+                                    <!-- Modal Cambiar Contraseña -->
+                                    <div class="modal fade text-start" id="modalPass{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="/admin/usuarios/password/{{ u_key }}">
+                                                    <div class="modal-header card-header-custom">
+                                                        <h5 class="modal-title">Resetear Contraseña: {{ u_key }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Nueva Contraseña</label>
+                                                            <input type="password" name="nueva_pass" class="form-control" placeholder="Ingrese nueva contraseña" required>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-custom">Actualizar Contraseña</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

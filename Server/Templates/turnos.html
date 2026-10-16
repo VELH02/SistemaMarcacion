@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-5 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Configurar Nuevo Turno</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/turnos">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Código Turno</label>
+                        <input type="text" name="turno_id" class="form-control" placeholder="Ej: T1, T2, TURNO-A" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre descriptivo</label>
+                        <input type="text" name="nombre" class="form-control" placeholder="Ej: Turno Diurno 6 a 2:30" required>
+                    </div>
+                    <div class="row mb-3">
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Entrada</label>
+                            <input type="time" name="hora_entrada" class="form-control" required>
+                        </div>
+                        <div class="col-6">
+                            <label class="form-label fw-bold">Salida</label>
+                            <input type="time" name="hora_salida" class="form-control" required>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tipo de Jornada</label>
+                        <select name="tipo" class="form-select" required>
+                            <option value="Diurna">Diurna (06:00 a 18:00)</option>
+                            <option value="Mixta">Mixta (Día y Noche)</option>
+                            <option value="Nocturna">Nocturna (18:00 a 06:00)</option>
+                        </select>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100">Guardar Turno</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-7">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Catálogo de Turnos Existentes</h5>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Código</th>
+                            <th>Descripción</th>
+                            <th>Horario</th>
+                            <th>Tipo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for code, t in turnos.items() %}
+                        <tr>
+                            <td><code>{{ code }}</code></td>
+                            <td><strong>{{ t.nombre }}</strong></td>
+                            <td>{{ t.hora_entrada }} - {{ t.hora_salida }}</td>
+                            <td><span class="badge bg-secondary">{{ t.tipo }}</span></td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

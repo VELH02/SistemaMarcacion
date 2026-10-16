@@ -1,0 +1,12 @@
+{
+    "EMP-001": {
+        "nombre": "Pedro",
+        "apellido": "Martinez",
+        "area": "OPERACIONES"
+    },
+    "EMP-002": {
+        "nombre": "Maria",
+        "apellido": "Gomez",
+        "area": "MANTENIMIENTO"
+    }
+}

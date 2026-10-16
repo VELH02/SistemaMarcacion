@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card shadow-sm">
+    <div class="card-header card-header-custom">
+        <h5 class="mb-0">Asignación de Turnos a Colaboradores</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover align-middle mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>Código</th>
+                        <th>Nombre</th>
+                        <th>Área</th>
+                        <th>Turno Asignado</th>
+                        <th class="text-center">Acción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for code, emp in empleados.items() %}
+                    <tr>
+                        <td><code>{{ code }}</code></td>
+                        <td><strong>{{ emp.nombre }}</strong></td>
+                        <td><span class="badge bg-secondary">{{ emp.area }}</span></td>
+                        <td>
+                            {% set t_id = emp.turno_id | default('T1') %}
+                            <span class="badge bg-success fs-6">{{ turnos[t_id].nombre if t_id in turnos else t_id }}</span>
+                        </td>
+                        <td class="text-center">
+                            <button type="button" class="btn btn-sm btn-custom" data-bs-toggle="modal" data-bs-target="#modalHorario{{ code }}">
+                                Cambiar Turno
+                            </button>
+
+                            <div class="modal fade text-start" id="modalHorario{{ code }}" tabindex="-1">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <form method="POST" action="/horarios">
+                                            <input type="hidden" name="emp_id" value="{{ code }}">
+                                            <div class="modal-header card-header-custom">
+                                                <h5 class="modal-title">Asignar Turno - {{ emp.nombre }}</h5>
+                                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="mb-3">
+                                                    <label class="form-label fw-bold">Seleccione el Turno</label>
+                                                    <select name="turno_id" class="form-select" required>
+                                                        {% for t_code, t_data in turnos.items() %}
+                                                            <option value="{{ t_code }}" {% if emp.turno_id == t_code %}selected{% endif %}>
+                                                                {{ t_code }} - {{ t_data.nombre }} ({{ t_data.hora_entrada }} a {{ t_data.hora_salida }})
+                                                            </option>
+                                                        {% endfor %}
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                <button type="submit" class="btn btn-custom">Guardar Asignación</button>
+                                            </div>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% endblock %}

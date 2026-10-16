@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Configuración del Servidor y Red</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/config">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="puerto" class="form-label fw-bold">Puerto del Servidor</label>
+                            <input type="number" class="form-control" id="puerto" name="puerto" value="{{ config.puerto_escucha }}" required>
+                            <small class="text-muted">Por defecto: 5000.</small>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="servidor_ntp" class="form-label fw-bold">Servidor de Tiempo (NTP)</label>
+                            <input type="text" class="form-control" id="servidor_ntp" name="servidor_ntp" value="{{ config.servidor_ntp | default('pool.ntp.org') }}" placeholder="Ej: pool.ntp.org, time.google.com" required>
+                            <small class="text-muted">Servidor horario para sincronizar el reloj.</small>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <label for="ips" class="form-label fw-bold">IPs Permitidas (Terminales Biométricos)</label>
+                        <input type="text" class="form-control" id="ips" name="ips" value="{{ config.ips_permitidas | join(',') }}" placeholder="Ej: 192.168.1.50, 192.168.1.51">
+                        <small class="text-muted">Separadas por coma. Dejar en blanco para aceptar cualquier IP de la red local.</small>
+                    </div>
+
+                    <button type="submit" class="btn btn-custom w-100">Guardar Configuración</button>
+                    
+                    <div class="alert alert-warning mt-3 mb-0" role="alert">
+                        <strong>Nota:</strong> Si modifica el puerto de escucha, deberá reiniciar la aplicación (`run.py`).
+                    </div>
+                </form>
+            </div>
+        </div>
+
+        <!-- Tarjeta de Diagnóstico y Sincronización Horaria -->
+        <div class="card shadow-sm">
+            <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+                <h6 class="mb-0">⏱️ Estado del Servidor de Tiempo (NTP)</h6>
+                <form method="POST" action="/config/sync_ntp" class="mb-0">
+                    <button type="submit" class="btn btn-sm btn-outline-light">🔄 Sincronizar Ahora</button>
+                </form>
+            </div>
+            <div class="card-body">
+                <p class="mb-2"><strong>Servidor actual:</strong> <code>{{ config.servidor_ntp | default('pool.ntp.org') }}</code></p>
+                <p class="mb-0"><strong>Diagnóstico:</strong> <span class="badge bg-light text-dark border">{{ estado_ntp | default('Iniciando...') }}</span></p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

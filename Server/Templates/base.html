@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Alicapsa - Sistema de Marcaciones</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <style>
+        :root {
+            --alicapsa-green: #208740;
+            --alicapsa-dark: #14532d;
+            --alicapsa-hover: #17642f;
+        }
+        body { background-color: #f4f6f9; }
+        .navbar-custom { 
+            background-color: #ffffff; 
+            border-bottom: 3px solid var(--alicapsa-green);
+        }
+        .nav-link {
+            color: #2b3b32 !important;
+            font-weight: 600;
+        }
+        .nav-link:hover {
+            color: var(--alicapsa-green) !important;
+        }
+        .btn-custom { background-color: var(--alicapsa-green); color: white; }
+        .btn-custom:hover { background-color: var(--alicapsa-hover); color: white; }
+        .card-header-custom { background-color: var(--alicapsa-green); color: white; }
+        .clock-badge {
+            background-color: #f8faf9;
+            border: 1px solid #d1ded6;
+            color: #14532d;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-custom mb-4 shadow-sm py-2">
+        <div class="container-fluid px-4">
+            <!-- Logo grande sin recuadro blanco -->
+            <a class="navbar-brand d-flex align-items-center py-0 me-3" href="/">
+                <img src="{{ url_for('static', filename='logo.png') }}" 
+                     alt="Alicapsa" 
+                     height="52" 
+                     class="d-inline-block">
+            </a>
+
+            <!-- Reloj del Servidor Sincronizado por NTP -->
+            <div class="d-none d-md-flex align-items-center clock-badge rounded-pill px-3 py-1 shadow-sm me-auto">
+                <span class="me-2 text-success">🕒</span>
+                <span id="reloj-hora" class="fw-bold font-monospace fs-6">--:--:--</span>
+                <span id="reloj-fecha" class="text-muted ms-2 small border-start ps-2">--/--/----</span>
+                <span id="reloj-badge" class="badge bg-success ms-2" style="font-size: 0.65rem;" title="Sincronizado vía NTP">NTP</span>
+            </div>
+
+            {% if session.get('usuario') %}
+            <div class="collapse navbar-collapse flex-grow-0">
+                <ul class="navbar-nav ms-auto align-items-center">
+                    <li class="nav-item me-3 text-muted small">
+                        Área: <strong class="text-dark">{{ session.get('area') }}</strong>
+                    </li>
+                    <li class="nav-item"><a class="nav-link" href="/">Asistencias</a></li>
+                    <li class="nav-item"><a class="nav-link" href="/colaboradores">Colaboradores</a></li>
+                    
+                    {% if session.get('usuario') == 'admin' or session.get('area') == 'TODAS' %}
+                        <li class="nav-item"><a class="nav-link text-success fw-bold" href="/admin/areas">Áreas</a></li>
+                        <li class="nav-item"><a class="nav-link text-success fw-bold" href="/admin/usuarios">Usuarios</a></li>
+                        <li class="nav-item"><a class="nav-link text-warning fw-bold" href="/consola">Consola Red</a></li>
+                        <li class="nav-item"><a class="nav-link text-secondary fw-bold" href="/config">Configuración</a></li>
+                    {% endif %}
+                    
+                    <li class="nav-item"><a class="btn btn-sm btn-outline-danger ms-3 px-3 rounded-pill" href="/logout">Salir</a></li>
+                </ul>
+            </div>
+            {% endif %}
+        </div>
+    </nav>
+
+    <div class="container mb-5">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm">{{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </div>
+
+    <!-- Script del Reloj en Tiempo Real -->
+    <script>
+        let serverDate = new Date();
+        let relojHora = document.getElementById('reloj-hora');
+        let relojFecha = document.getElementById('reloj-fecha');
+
+        function actualizarTick() {
+            serverDate.setSeconds(serverDate.getSeconds() + 1);
+            let h = String(serverDate.getHours()).padStart(2, '0');
+            let m = String(serverDate.getMinutes()).padStart(2, '0');
+            let s = String(serverDate.getSeconds()).padStart(2, '0');
+            if (relojHora) relojHora.innerText = `${h}:${m}:${s}`;
+        }
+
+        function calibrarConServidor() {
+            fetch('/api/hora')
+                .then(r => r.json())
+                .then(d => {
+                    if (relojFecha) relojFecha.innerText = d.fecha;
+                    let partesHora = d.hora.split(':');
+                    let partesFecha = d.fecha.split('/');
+                    // Recrear fecha basada en el servidor NTP
+                    serverDate = new Date(partesFecha[2], partesFecha[1] - 1, partesFecha[0], partesHora[0], partesHora[1], partesHora[2]);
+                    let h = String(serverDate.getHours()).padStart(2, '0');
+                    let m = String(serverDate.getMinutes()).padStart(2, '0');
+                    let s = String(serverDate.getSeconds()).padStart(2, '0');
+                    if (relojHora) relojHora.innerText = `${h}:${m}:${s}`;
+                })
+                .catch(() => {});
+        }
+
+        // Calibrar al cargar y cada 45 segundos
+        calibrarConServidor();
+        setInterval(calibrarConServidor, 45000);
+        // Avanzar el segundero localmente cada segundo
+        setInterval(actualizarTick, 1000);
+    </script>
+</body>
+</html>
