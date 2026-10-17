@@ -1,0 +1,5 @@
+{
+    "server_ip": "http://10.120.4.50",
+    "server_port": "5000",
+    "server_url": "http://10.120.4.50:5000/api"
+}
