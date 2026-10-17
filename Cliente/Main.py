@@ -14,6 +14,7 @@
 import os
 import time
 import json
+import threading
 import multiprocessing as mp
 import tkinter as tk
 from tkinter import ttk
@@ -33,9 +34,11 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # CONFIGURACIÓN DE ARCHIVOS, IP Y PALETA DE COLORES (ALICAPSA)
 # ----------------------------------------------------------------------
 CONFIG_FILE = "config.json"
+EMPLEADOS_FILE_LOCAL = "empleados.json"  # Réplica local del archivo del servidor
 DEFAULT_SERVER_URL = "http://127.0.0.1:5000/api"
 DIR_ROSTROS = "base_rostros"
 ADMIN_PIN = "123456"
+INTERVALO_SYNC_SEGUNDOS = 10  # Sincronización automática cada 1 hora (3600s)
 
 UMBRAL_DISTANCIA_ESTRICTO = 0.48  
 
@@ -57,6 +60,9 @@ COLOR_DANGER = "#D9383A"         # Rojo Alerta / Borrar
 COLOR_DANGER_HOVER = "#B82A2C"   # Rojo Oscuro (Hover)
 COLOR_WARNING = "#D9822B"        # Naranja Advertencia
 COLOR_WARNING_HOVER = "#B86A1F"  # Naranja Oscuro (Hover)
+
+# Mapa Global en Memoria para traducir rápido RFID -> ID de Empleado
+MAPA_RFID_A_ID = {}
 
 
 # ----------------------------------------------------------------------
@@ -125,66 +131,218 @@ def get_server_url():
 
 
 # ----------------------------------------------------------------------
-# GESTIÓN BIOMÉTRICA Y COMUNICACIÓN REST API
+# LECTURA Y ESCRITURA DEL ARCHIVO LOCAL EMPLEADOS.JSON
 # ----------------------------------------------------------------------
-def obtener_vector_biometrico(identificador):
-    """Busca al colaborador en el servidor o localmente por ID o RFID"""
+def cargar_empleados_locales():
+    """Lee la réplica local de empleados.json"""
+    if not os.path.exists(EMPLEADOS_FILE_LOCAL) or os.path.getsize(EMPLEADOS_FILE_LOCAL) == 0:
+        return {}
+    try:
+        with open(EMPLEADOS_FILE_LOCAL, "r", encoding="utf-8") as f:
+            return json.load(f)
+    except Exception:
+        return {}
+
+
+def guardar_empleados_locales(data_empleados):
+    """Guarda o actualiza el archivo local empleados.json"""
+    try:
+        with open(EMPLEADOS_FILE_LOCAL, "w", encoding="utf-8") as f:
+            json.dump(data_empleados, f, indent=4, ensure_ascii=False)
+    except Exception as e:
+        print(f"[ERROR] No se pudo guardar empleados.json localmente: {e}")
+
+
+def reconstruir_mapa_rfid_local(data_empleados):
+    """Reconstruye la tabla en memoria RAM de RFID -> ID_Empleado"""
+    global MAPA_RFID_A_ID
+    nuevo_mapa = {}
+    for emp_id, info in data_empleados.items():
+        emp_id_clean = str(emp_id).strip().upper()
+        rfid_clean = str(info.get("rfid", "")).strip().upper()
+        if rfid_clean:
+            nuevo_mapa[rfid_clean] = emp_id_clean
+    MAPA_RFID_A_ID = nuevo_mapa
+
+
+# ----------------------------------------------------------------------
+# SINCRONIZACIÓN Y GESTIÓN BIOMÉTRICA CON EL SERVIDOR REST API
+# ----------------------------------------------------------------------
+def sincronizar_empleados_servidor():
+    """
+    Descarga periódicamente (cada hora) el archivo empleados.json completo del servidor.
+    Actualiza la copia local empleados.json, extrae los vectores faciales a .npy en base_rostros/
+    y actualiza el diccionario de tarjetas RFID en memoria RAM.
+    """
     inicializar_entorno()
-    identificador_limpio = str(identificador).strip().upper()
     server_url = get_server_url()
 
-    # 1. Búsqueda en Servidor REST (soporta ID o RFID)
+    try:
+        res = requests.get(f"{server_url}/empleados", timeout=6, verify=False)
+        if res.status_code == 200:
+            data = res.json()
+            
+            # Normalizar respuesta (diccionario indexado por ID)
+            empleados_dict = {}
+            if isinstance(data, dict):
+                empleados_dict = data
+            elif isinstance(data, list):
+                for item in data:
+                    e_id = item.get("empleado_id") or item.get("id")
+                    if e_id:
+                        empleados_dict[str(e_id)] = item
+
+            # 1. Guardar la réplica local en empleados.json
+            guardar_empleados_locales(empleados_dict)
+            
+            # 2. Reconstruir mapa de tarjetas RFID
+            reconstruir_mapa_rfid_local(empleados_dict)
+
+            # 3. Guardar/actualizar cada vector facial en base_rostros/<EMP_ID>.npy
+            contador_vectores = 0
+            for emp_id, info in empleados_dict.items():
+                emp_id_str = str(emp_id).strip().upper()
+                vector_list = info.get("vector_facial", [])
+                
+                if isinstance(vector_list, list) and len(vector_list) == 128:
+                    vector_np = np.array(vector_list, dtype=np.float64)
+                    ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_str}.npy")
+                    np.save(ruta_local, vector_np)
+                    contador_vectores += 1
+
+            msg = f"✓ Sincronización exitosa: {len(empleados_dict)} empleados guardados en empleados.json ({contador_vectores} vectores .npy)."
+            print(f"[SYNC] {msg}")
+            return True, msg
+        else:
+            return False, f"⚠️ Respuesta del servidor HTTP {res.status_code}"
+    except requests.exceptions.RequestException:
+        # Si falla la conexión con el servidor, rellenamos el mapa RFID con los datos locales previamente guardados
+        emps_locales = cargar_empleados_locales()
+        reconstruir_mapa_rfid_local(emps_locales)
+        return False, f"❌ Sin conexión con el servidor REST ({server_url}). Trabajando en modo Offline con empleados.json local."
+
+
+def obtener_vector_biometrico(identificador):
+    """
+    Busca al colaborador. 
+    1. Revisa el mapa local RFID y el archivo local empleados.json / .npy
+    2. Si no lo encuentra localmente, consulta directamente al Servidor REST.
+    """
+    inicializar_entorno()
+    identificador_limpio = str(identificador).strip().upper()
+    
+    # Traducir RFID -> ID real de empleado si aplica
+    emp_id_real = MAPA_RFID_A_ID.get(identificador_limpio, identificador_limpio)
+    
+    # 1. Intentar buscar en la base local (empleados.json y .npy)
+    emps_locales = cargar_empleados_locales()
+    
+    # Si la búsqueda vino por código de empleado o mapeo
+    if emp_id_real in emps_locales:
+        info_emp = emps_locales[emp_id_real]
+        depto = info_emp.get("area") or info_emp.get("departamento") or "OPERACIONES"
+        ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_real}.npy")
+        
+        # Cargar archivo .npy local si existe
+        if os.path.exists(ruta_local):
+            try:
+                vector = np.load(ruta_local)
+                if len(vector) == 128:
+                    return True, emp_id_real, depto, vector, "✓ Carga instantánea desde empleados.json local"
+            except Exception:
+                pass
+
+        # Si el .npy no estaba pero el vector_facial está dentro del JSON local
+        vector_list = info_emp.get("vector_facial", [])
+        if isinstance(vector_list, list) and len(vector_list) == 128:
+            vector_np = np.array(vector_list, dtype=np.float64)
+            np.save(ruta_local, vector_np)
+            return True, emp_id_real, depto, vector_np, "✓ Vector restaurado desde empleados.json local"
+
+    # 2. Si no se halló en la copia local, consultar al Servidor en tiempo real
+    server_url = get_server_url()
     try:
         res = requests.get(f"{server_url}/empleados/{identificador_limpio}", timeout=4, verify=False)
         if res.status_code == 200:
             data = res.json()
-            emp_id_real = data.get("empleado_id") or data.get("id") or identificador_limpio
-            depto = data.get("departamento", "N/A")
+            real_id = str(data.get("empleado_id") or data.get("id") or identificador_limpio).strip().upper()
+            depto = data.get("area") or data.get("departamento") or "OPERACIONES"
             vector_list = data.get("vector_facial", [])
 
-            if vector_list and len(vector_list) > 0:
-                vector = np.array(vector_list, dtype=np.float64)
-                ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_real}.npy")
-                np.save(ruta_local, vector)
-                return True, emp_id_real, depto, vector, "✓ Biometría obtenida desde Servidor"
+            if isinstance(vector_list, list) and len(vector_list) == 128:
+                vector_np = np.array(vector_list, dtype=np.float64)
+                
+                # Actualizar réplica local
+                emps = cargar_empleados_locales()
+                emps[real_id] = {
+                    "nombre": data.get("nombre", ""),
+                    "apellido": data.get("apellido", ""),
+                    "area": depto,
+                    "rfid": str(data.get("rfid", "")).strip().upper(),
+                    "vector_facial": vector_list
+                }
+                guardar_empleados_locales(emps)
+                reconstruir_mapa_rfid_local(emps)
+                
+                ruta_guardar = os.path.join(DIR_ROSTROS, f"{real_id}.npy")
+                np.save(ruta_guardar, vector_np)
+                
+                return True, real_id, depto, vector_np, "✓ Biometría obtenida desde Servidor"
+            else:
+                return False, real_id, depto, None, f"⚠️ El ID {real_id} no tiene un vector facial válido."
         elif res.status_code == 404:
             return False, identificador_limpio, "", None, f"⚠️ El ID o RFID '{identificador_limpio}' no está registrado."
     except requests.exceptions.RequestException:
         pass
 
-    # 2. Fallback local en caso de pérdida de conexión
-    ruta_local = os.path.join(DIR_ROSTROS, f"{identificador_limpio}.npy")
-    if os.path.exists(ruta_local):
-        try:
-            vector = np.load(ruta_local)
-            return True, identificador_limpio, "N/A", vector, "OK (Cargado de base local)"
-        except Exception:
-            pass
-
-    return False, identificador_limpio, "", None, f"❌ Sin conexión con el servidor REST ({server_url})"
+    return False, identificador_limpio, "", None, f"❌ El ID o RFID '{identificador_limpio}' no fue encontrado localmente."
 
 
 def api_guardar_nuevo_empleado(emp_id, departamento, rfid, vector_np):
-    """Guarda localmente el vector .npy y envía el payload completo al Servidor REST"""
+    """
+    Guarda localmente el vector en base_rostros/<ID>.npy, actualiza el empleados.json local,
+    y envía la estructura al servidor REST vía HTTP POST.
+    """
     inicializar_entorno()
-    ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id}.npy")
+    emp_id_clean = str(emp_id).strip().upper()
+    rfid_clean = str(rfid).strip().upper()
+    vector_list = vector_np.tolist()
+    
+    # 1. Guardar vector local .npy
+    ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_clean}.npy")
     np.save(ruta_local, vector_np)
+    
+    # 2. Actualizar réplica local en empleados.json
+    emps = cargar_empleados_locales()
+    datos_previos = emps.get(emp_id_clean, {})
+    emps[emp_id_clean] = {
+        "nombre": datos_previos.get("nombre", ""),
+        "apellido": datos_previos.get("apellido", ""),
+        "area": departamento,
+        "rfid": rfid_clean,
+        "vector_facial": vector_list
+    }
+    guardar_empleados_locales(emps)
+    reconstruir_mapa_rfid_local(emps)
 
+    # 3. Enviar payload al servidor REST
     server_url = get_server_url()
     payload = {
-        "empleado_id": str(emp_id).strip().upper(),
+        "empleado_id": emp_id_clean,
+        "area": departamento,
         "departamento": departamento,
-        "rfid": str(rfid).strip().upper(),
-        "vector_facial": vector_np.tolist()
+        "rfid": rfid_clean,
+        "vector_facial": vector_list
     }
+    
     try:
         res = requests.post(f"{server_url}/empleados/enrolar", json=payload, timeout=5, verify=False)
         if res.status_code in [200, 201]:
-            return True, "Colaborador enrolado localmente y respaldado en servidor."
+            return True, "✓ Colaborador registrado localmente y respaldado en el servidor."
         else:
-            return True, "Enrolado localmente (⚠️ No se pudo hacer el backup en servidor)."
+            return True, "✓ Registrado en el cliente local (⚠️ No se pudo respaldar en servidor)."
     except requests.exceptions.RequestException:
-        return True, "Enrolado localmente (⚠️ Sin conexión con servidor para backup)."
+        return True, "✓ Registrado en el cliente local (⚠️ Servidor fuera de línea, se respaldará luego)."
 
 
 def api_registrar_marcacion(emp_id, tipo_marcacion, nota=""):
@@ -198,7 +356,7 @@ def api_registrar_marcacion(emp_id, tipo_marcacion, nota=""):
         res = requests.post(f"{server_url}/marcaciones", json=payload, timeout=5, verify=False)
         if res.status_code in [200, 201]:
             data = res.json()
-            return True, data.get("mensaje", "Marcación registrada")
+            return True, data.get("mensaje", "Marcación registrada exitosamente")
         else:
             err_msg = res.json().get("error", "Error en el servidor")
             return False, f"⚠️ {err_msg}"
@@ -218,7 +376,7 @@ def api_obtener_historial(emp_id):
 
 
 # ----------------------------------------------------------------------
-# DETECCIÓN DE PARPADEO (EAR)
+# DETECCIÓN DE PARPADEO (EYE ASPECT RATIO - EAR)
 # ----------------------------------------------------------------------
 def calcular_ear(ojo):
     A = np.linalg.norm(ojo[1] - ojo[5])
@@ -345,7 +503,7 @@ class HeaderNutresa(tk.Frame):
 
 
 # ----------------------------------------------------------------------
-# APLICACIÓN PRINCIPAL
+# APLICACIÓN PRINCIPAL (CON HILO AUTOMÁTICO DE SINCRONIZACIÓN CADA 1 HORA)
 # ----------------------------------------------------------------------
 class SistemaMarcacionApp(tk.Tk):
     def __init__(self):
@@ -376,6 +534,9 @@ class SistemaMarcacionApp(tk.Tk):
 
         inicializar_entorno()
 
+        # Cargar empledos locales existentes al arrancar
+        reconstruir_mapa_rfid_local(cargar_empleados_locales())
+
         self.current_emp_code = ""
         self.current_emp_depto = ""
         self.current_emp_vector = None
@@ -386,6 +547,7 @@ class SistemaMarcacionApp(tk.Tk):
         self.timer_id = None
         self.t_inicio_solicitud = 0.0
 
+        # Proceso Multiprocessing para Biometría
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
         self.worker_process = mp.Process(
@@ -394,6 +556,11 @@ class SistemaMarcacionApp(tk.Tk):
             daemon=True
         )
         self.worker_process.start()
+
+        # Iniciar Hilo Secundario de Sincronización Automática
+        self.sync_activa = True
+        self.hilo_sync = threading.Thread(target=self._loop_sincronizacion_periodica, daemon=True)
+        self.hilo_sync.start()
 
         self.container = tk.Frame(self, bg=COLOR_BG)
         self.container.pack(fill="both", expand=True)
@@ -413,6 +580,20 @@ class SistemaMarcacionApp(tk.Tk):
 
         self.protocol("WM_DELETE_WINDOW", self.on_closing)
         self.show_frame("PantallaPrincipal")
+
+    def _loop_sincronizacion_periodica(self):
+        """Sincroniza al iniciar y luego repite la descarga cada 1 hora (3600s)."""
+        while self.sync_activa:
+            try:
+                sincronizar_empleados_servidor()
+            except Exception as e:
+                print(f"[SYNC ERROR] Error en hilo de sincronización: {e}")
+            
+            # Esperar 1 hora
+            for _ in range(INTERVALO_SYNC_SEGUNDOS):
+                if not self.sync_activa:
+                    break
+                time.sleep(1)
 
     def show_frame(self, page_name):
         for name, frame in self.frames.items():
@@ -445,6 +626,7 @@ class SistemaMarcacionApp(tk.Tk):
         return "PantallaPrincipal"
 
     def on_closing(self):
+        self.sync_activa = False
         try:
             self.input_queue.put(None)
         except Exception:
@@ -666,7 +848,7 @@ class PantallaAdminPin(tk.Frame):
 
 
 # ----------------------------------------------------------------------
-# VISTA: CONFIGURACIÓN
+# VISTA: CONFIGURACIÓN DE IP Y PRUEBA DE CONEXIÓN
 # ----------------------------------------------------------------------
 class PantallaConfiguracion(tk.Frame):
     def __init__(self, parent, controller):
@@ -825,6 +1007,7 @@ class PantallaConfiguracion(tk.Frame):
         endpoints_a_probar = [
             f"{base_url}/api/ping",
             f"{base_url}/api",
+            f"{base_url}/api/empleados",
             f"{base_url}/api/marcaciones",
             f"{base_url}/"
         ]
@@ -846,6 +1029,7 @@ class PantallaConfiguracion(tk.Frame):
 
         if exito:
             self.lbl_status.config(text=mensaje_respuesta, fg=COLOR_PRIMARY)
+            threading.Thread(target=sincronizar_empleados_servidor, daemon=True).start()
         else:
             self.lbl_status.config(
                 text=f"❌ Imposible conectar al puerto HTTP en {base_url}\n"
@@ -863,6 +1047,7 @@ class PantallaConfiguracion(tk.Frame):
 
         guardar_configuracion(ip, port)
         self.lbl_status.config(text="✓ Configuración de Servidor e IP guardada correctamente.", fg=COLOR_PRIMARY)
+        threading.Thread(target=sincronizar_empleados_servidor, daemon=True).start()
         self.after(1200, lambda: self.controller.show_frame("PantallaPrincipal"))
 
 
@@ -937,7 +1122,7 @@ class PantallaTeclado(tk.Frame):
         if not codigo_o_rfid:
             return
         
-        self.lbl_msg.config(text="⏳ Buscando biometría...", fg=COLOR_WARNING)
+        self.lbl_msg.config(text="⏳ Verificando biometría...", fg=COLOR_WARNING)
         self.update_idletasks()
 
         ok, real_emp_id, depto, vector, msg = obtener_vector_biometrico(codigo_o_rfid)
@@ -1193,7 +1378,6 @@ class PantallaEnrolar(tk.Frame):
         panel_form.configure(highlightbackground=COLOR_CARD_BORDER)
         panel_form.pack(side="left", fill="both", expand=True, padx=(4, 4), pady=4)
 
-        # Campos de Formulario: ID y RFID
         tk.Label(panel_form, text="1. CÓDIGO / CÉDULA:", font=(FONT_PRIMARY, 8, "bold"), fg=COLOR_MUTED, bg=COLOR_CARD).pack(anchor="w", padx=12, pady=(4, 0))
         self.var_id = tk.StringVar()
         self.ent_id = tk.Entry(panel_form, textvariable=self.var_id, font=(FONT_PRIMARY, 12, "bold"), justify="center", bd=1, relief="solid", state="readonly", bg=COLOR_BG, fg=COLOR_PRIMARY)
@@ -1204,7 +1388,6 @@ class PantallaEnrolar(tk.Frame):
         self.ent_rfid = tk.Entry(panel_form, textvariable=self.var_rfid, font=(FONT_PRIMARY, 12, "bold"), justify="center", bd=1, relief="solid", state="readonly", bg=COLOR_BG, fg=COLOR_PRIMARY)
         self.ent_rfid.pack(fill="x", padx=12, pady=(2, 4))
 
-        # Control del campo activo para el teclado
         self.active_var = self.var_id
         self.active_entry = self.ent_id
 
