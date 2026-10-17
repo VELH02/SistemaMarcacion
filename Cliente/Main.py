@@ -1,19 +1,20 @@
-#Agregar un historico, just in case de que la persona no le autentique
-#sincronizar json de informacion
-#Agregar las demencias del rfid +++
-#Servidor de Google tema horas +++
-#Conseguir una pantalla y camara adicional (Backup)
-#Cambiar Color de botones de main, por un gris claro +++
-#Crear un super user para el registro (coordinadores) +++
-#Conseguir un par de UPS para las 2 pantallitas cool
-#Conseguir el espacio (fisico) para las UPS
-#Hacer que el reloj se vea en la pantalla principal +++
+#Agregar un historico, just in case de que la persona no le autentique +++ 
+#sincronizar json de informacion +++ 
+#Agregar las demencias del rfid +++ 
+#Servidor de Google tema horas +++ 
+#Conseguir una pantalla y camara adicional (Backup) 
+#Cambiar Color de botones de main, por un gris claro +++ 
+#Crear un super user para el registro (coordinadores) +++ 
+#Conseguir un par de UPS para las 2 pantallitas cool 
+#Conseguir el espacio (fisico) para las UPS 
+#Hacer que el reloj se vea en la pantalla principal +++ 
 # ======================================================================
 # CONTROL DE ASISTENCIA Y TIEMPO - CLIENTE BIOMÉTRICO (ALICAPSA)
 # ======================================================================
 import os
 import time
 import json
+import csv
 import threading
 import multiprocessing as mp
 import tkinter as tk
@@ -34,11 +35,13 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 # CONFIGURACIÓN DE ARCHIVOS, IP Y PALETA DE COLORES (ALICAPSA)
 # ----------------------------------------------------------------------
 CONFIG_FILE = "config.json"
-EMPLEADOS_FILE_LOCAL = "empleados.json"  # Réplica local del archivo del servidor
+EMPLEADOS_FILE_LOCAL = "empleados.json"       # Réplica local del archivo del servidor
+LOG_FILE = "log_incidentes.csv"               # Bitácora histórica de fallos e incidencias
+MARCACIONES_PENDIENTES_FILE = "marcaciones_pendientes.csv" # Cola offline de marcaciones
 DEFAULT_SERVER_URL = "http://127.0.0.1:5000/api"
 DIR_ROSTROS = "base_rostros"
 ADMIN_PIN = "123456"
-INTERVALO_SYNC_SEGUNDOS = 10  # Sincronización automática cada 1 hora (3600s)
+INTERVALO_SYNC_SEGUNDOS = 3600  # Descarga de empleados.json cada 1 hora (3600s)
 
 UMBRAL_DISTANCIA_ESTRICTO = 0.48  
 
@@ -63,6 +66,97 @@ COLOR_WARNING_HOVER = "#B86A1F"  # Naranja Oscuro (Hover)
 
 # Mapa Global en Memoria para traducir rápido RFID -> ID de Empleado
 MAPA_RFID_A_ID = {}
+
+
+# ----------------------------------------------------------------------
+# SISTEMA DE LOGS E INCIDENCIAS (AUDITORÍA LOCAL)
+# ----------------------------------------------------------------------
+def registrar_log_incidente(emp_id, operacion, motivo, detalle=""):
+    """Guarda un registro de falla o intento fallido en formato CSV local."""
+    try:
+        existe = os.path.exists(LOG_FILE)
+        ahora = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        with open(LOG_FILE, "a", encoding="utf-8", newline="") as f:
+            writer = csv.writer(f)
+            if not existe:
+                writer.writerow(["Fecha_Hora", "Empleado_ID", "Operacion", "Motivo_Fallo", "Detalle"])
+            writer.writerow([ahora, str(emp_id), str(operacion), str(motivo), str(detalle)])
+    except Exception as e:
+        print(f"[ERROR LOG] No se pudo escribir en la bitácora: {e}")
+
+
+# ----------------------------------------------------------------------
+# COLA OFFLINE DE MARCACIONES PENDIENTES
+# ----------------------------------------------------------------------
+def guardar_marcacion_pendiente(emp_id, tipo_marcacion, fecha_hora_str, nota=""):
+    """Guarda localmente las marcaciones no enviadas por falta de red."""
+    try:
+        existe = os.path.exists(MARCACIONES_PENDIENTES_FILE) and os.path.getsize(MARCACIONES_PENDIENTES_FILE) > 0
+        with open(MARCACIONES_PENDIENTES_FILE, "a", encoding="utf-8", newline="") as f:
+            writer = csv.writer(f)
+            if not existe:
+                writer.writerow(["Fecha_Hora", "Empleado_ID", "Tipo_Marcacion", "Nota"])
+            writer.writerow([fecha_hora_str, str(emp_id), str(tipo_marcacion), str(nota)])
+        print(f"[OFFLINE QUEUE] Marcación de {emp_id} guardada en cola local ({fecha_hora_str}).")
+    except Exception as e:
+        print(f"[OFFLINE QUEUE ERROR] No se pudo guardar marcación local: {e}")
+
+
+def sincronizar_marcaciones_pendientes():
+    """Procesa e intenta enviar al servidor todas las marcaciones acumuladas offline."""
+    if not os.path.exists(MARCACIONES_PENDIENTES_FILE) or os.path.getsize(MARCACIONES_PENDIENTES_FILE) == 0:
+        return
+
+    pendientes = []
+    try:
+        with open(MARCACIONES_PENDIENTES_FILE, "r", encoding="utf-8") as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get("Empleado_ID"):
+                    pendientes.append(row)
+    except Exception as e:
+        print(f"[OFFLINE SYNC ERROR] Error leyendo cola de marcaciones: {e}")
+        return
+
+    if not pendientes:
+        return
+
+    server_url = get_server_url()
+    restantes = []
+
+    for m in pendientes:
+        payload = {
+            "empleado_id": m["Empleado_ID"],
+            "tipo_marcacion": m["Tipo_Marcacion"],
+            "fecha_hora": m.get("Fecha_Hora", ""),
+            "nota": f"{m.get('Nota', '')} (Sincronizado Offline)".strip()
+        }
+        try:
+            res = requests.post(f"{server_url}/marcaciones", json=payload, timeout=5, verify=False)
+            if res.status_code in [200, 201]:
+                print(f"[OFFLINE SYNC] Marcación offline enviada con éxito para ID {m['Empleado_ID']}.")
+            else:
+                # Si hubo error del servidor pero hay respuesta, se reintentará en el próximo ciclo
+                restantes.append(m)
+        except requests.exceptions.RequestException:
+            # Si se interrumpe la conexión, conservamos las marcaciones no procesadas
+            idx = pendientes.index(m)
+            restantes.extend(pendientes[idx:])
+            break
+
+    # Sobrescribir archivo solo con las marcaciones que aún no se pudieron enviar
+    try:
+        if restantes:
+            with open(MARCACIONES_PENDIENTES_FILE, "w", encoding="utf-8", newline="") as f:
+                writer = csv.DictWriter(f, fieldnames=["Fecha_Hora", "Empleado_ID", "Tipo_Marcacion", "Nota"])
+                writer.writeheader()
+                writer.writerows(restantes)
+        else:
+            if os.path.exists(MARCACIONES_PENDIENTES_FILE):
+                os.remove(MARCACIONES_PENDIENTES_FILE)
+            print("[OFFLINE SYNC] ✓ Todas las marcaciones pendientes fueron subidas al servidor.")
+    except Exception as e:
+        print(f"[OFFLINE SYNC ERROR] Error actualizando cola local: {e}")
 
 
 # ----------------------------------------------------------------------
@@ -182,7 +276,6 @@ def sincronizar_empleados_servidor():
         if res.status_code == 200:
             data = res.json()
             
-            # Normalizar respuesta (diccionario indexado por ID)
             empleados_dict = {}
             if isinstance(data, dict):
                 empleados_dict = data
@@ -214,12 +307,13 @@ def sincronizar_empleados_servidor():
             print(f"[SYNC] {msg}")
             return True, msg
         else:
+            registrar_log_incidente("SISTEMA", "SINCRONIZACION", "Error HTTP Servidor", f"Código {res.status_code}")
             return False, f"⚠️ Respuesta del servidor HTTP {res.status_code}"
-    except requests.exceptions.RequestException:
-        # Si falla la conexión con el servidor, rellenamos el mapa RFID con los datos locales previamente guardados
+    except requests.exceptions.RequestException as e:
         emps_locales = cargar_empleados_locales()
         reconstruir_mapa_rfid_local(emps_locales)
-        return False, f"❌ Sin conexión con el servidor REST ({server_url}). Trabajando en modo Offline con empleados.json local."
+        registrar_log_incidente("SISTEMA", "SINCRONIZACION", "Servidor Inalcanzable", str(e))
+        return False, f"❌ Sin conexión con el servidor REST ({server_url}). Modo Offline activo."
 
 
 def obtener_vector_biometrico(identificador):
@@ -231,19 +325,16 @@ def obtener_vector_biometrico(identificador):
     inicializar_entorno()
     identificador_limpio = str(identificador).strip().upper()
     
-    # Traducir RFID -> ID real de empleado si aplica
     emp_id_real = MAPA_RFID_A_ID.get(identificador_limpio, identificador_limpio)
     
     # 1. Intentar buscar en la base local (empleados.json y .npy)
     emps_locales = cargar_empleados_locales()
     
-    # Si la búsqueda vino por código de empleado o mapeo
     if emp_id_real in emps_locales:
         info_emp = emps_locales[emp_id_real]
         depto = info_emp.get("area") or info_emp.get("departamento") or "OPERACIONES"
         ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_real}.npy")
         
-        # Cargar archivo .npy local si existe
         if os.path.exists(ruta_local):
             try:
                 vector = np.load(ruta_local)
@@ -252,14 +343,13 @@ def obtener_vector_biometrico(identificador):
             except Exception:
                 pass
 
-        # Si el .npy no estaba pero el vector_facial está dentro del JSON local
         vector_list = info_emp.get("vector_facial", [])
         if isinstance(vector_list, list) and len(vector_list) == 128:
             vector_np = np.array(vector_list, dtype=np.float64)
             np.save(ruta_local, vector_np)
             return True, emp_id_real, depto, vector_np, "✓ Vector restaurado desde empleados.json local"
 
-    # 2. Si no se halló en la copia local, consultar al Servidor en tiempo real
+    # 2. Consultar al Servidor en tiempo real si no está en local
     server_url = get_server_url()
     try:
         res = requests.get(f"{server_url}/empleados/{identificador_limpio}", timeout=4, verify=False)
@@ -272,7 +362,6 @@ def obtener_vector_biometrico(identificador):
             if isinstance(vector_list, list) and len(vector_list) == 128:
                 vector_np = np.array(vector_list, dtype=np.float64)
                 
-                # Actualizar réplica local
                 emps = cargar_empleados_locales()
                 emps[real_id] = {
                     "nombre": data.get("nombre", ""),
@@ -289,11 +378,13 @@ def obtener_vector_biometrico(identificador):
                 
                 return True, real_id, depto, vector_np, "✓ Biometría obtenida desde Servidor"
             else:
+                registrar_log_incidente(real_id, "BUSQUEDA_BIOMETRICA", "Vector Facial Inválido", "Menos de 128 valores")
                 return False, real_id, depto, None, f"⚠️ El ID {real_id} no tiene un vector facial válido."
         elif res.status_code == 404:
+            registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Colaborador No Registrado", "404 Not Found")
             return False, identificador_limpio, "", None, f"⚠️ El ID o RFID '{identificador_limpio}' no está registrado."
-    except requests.exceptions.RequestException:
-        pass
+    except requests.exceptions.RequestException as e:
+        registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Fallo Conexión Servidor", str(e))
 
     return False, identificador_limpio, "", None, f"❌ El ID o RFID '{identificador_limpio}' no fue encontrado localmente."
 
@@ -308,11 +399,9 @@ def api_guardar_nuevo_empleado(emp_id, departamento, rfid, vector_np):
     rfid_clean = str(rfid).strip().upper()
     vector_list = vector_np.tolist()
     
-    # 1. Guardar vector local .npy
     ruta_local = os.path.join(DIR_ROSTROS, f"{emp_id_clean}.npy")
     np.save(ruta_local, vector_np)
     
-    # 2. Actualizar réplica local en empleados.json
     emps = cargar_empleados_locales()
     datos_previos = emps.get(emp_id_clean, {})
     emps[emp_id_clean] = {
@@ -325,7 +414,6 @@ def api_guardar_nuevo_empleado(emp_id, departamento, rfid, vector_np):
     guardar_empleados_locales(emps)
     reconstruir_mapa_rfid_local(emps)
 
-    # 3. Enviar payload al servidor REST
     server_url = get_server_url()
     payload = {
         "empleado_id": emp_id_clean,
@@ -340,28 +428,45 @@ def api_guardar_nuevo_empleado(emp_id, departamento, rfid, vector_np):
         if res.status_code in [200, 201]:
             return True, "✓ Colaborador registrado localmente y respaldado en el servidor."
         else:
+            registrar_log_incidente(emp_id_clean, "ENROLAMIENTO", "Error Respuesta Servidor", f"HTTP {res.status_code}")
             return True, "✓ Registrado en el cliente local (⚠️ No se pudo respaldar en servidor)."
-    except requests.exceptions.RequestException:
+    except requests.exceptions.RequestException as e:
+        registrar_log_incidente(emp_id_clean, "ENROLAMIENTO", "Servidor Inalcanzable Backup", str(e))
         return True, "✓ Registrado en el cliente local (⚠️ Servidor fuera de línea, se respaldará luego)."
 
 
 def api_registrar_marcacion(emp_id, tipo_marcacion, nota=""):
+    """
+    Registra la marcación. Si el servidor no responde o la red está caída,
+    guarda el evento localmente en 'marcaciones_pendientes.csv' con fecha y hora exacta.
+    """
     server_url = get_server_url()
+    fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+
     payload = {
         "empleado_id": str(emp_id),
         "tipo_marcacion": tipo_marcacion,
+        "fecha_hora": fecha_hora_actual,
         "nota": nota
     }
+    
     try:
         res = requests.post(f"{server_url}/marcaciones", json=payload, timeout=5, verify=False)
         if res.status_code in [200, 201]:
             data = res.json()
+            # Si la conexión funciona, intentamos subir en segundo plano cualquier marcación previa acumulada
+            threading.Thread(target=sincronizar_marcaciones_pendientes, daemon=True).start()
             return True, data.get("mensaje", "Marcación registrada exitosamente")
         else:
-            err_msg = res.json().get("error", "Error en el servidor")
-            return False, f"⚠️ {err_msg}"
+            err_msg = res.json().get("error", f"Error HTTP {res.status_code}")
+            registrar_log_incidente(emp_id, tipo_marcacion, "Rechazo del Servidor", err_msg)
+            # Guardar localmente por precaución
+            guardar_marcacion_pendiente(emp_id, tipo_marcacion, fecha_hora_actual, f"{nota} (Servidor Rechazó: {err_msg})")
+            return True, "✓ Marcación guardada LOCALMENTE (Pendiente de Sincronizar)"
     except requests.exceptions.RequestException as e:
-        return False, f"❌ Error de conexión al servidor ({e})"
+        registrar_log_incidente(emp_id, tipo_marcacion, "Fallo Red Marcación", str(e))
+        guardar_marcacion_pendiente(emp_id, tipo_marcacion, fecha_hora_actual, f"{nota} (Red Caída)")
+        return True, "✓ Marcación guardada LOCALMENTE (Servidor Fuera de Línea)"
 
 
 def api_obtener_historial(emp_id):
@@ -503,7 +608,7 @@ class HeaderNutresa(tk.Frame):
 
 
 # ----------------------------------------------------------------------
-# APLICACIÓN PRINCIPAL (CON HILO AUTOMÁTICO DE SINCRONIZACIÓN CADA 1 HORA)
+# APLICACIÓN PRINCIPAL
 # ----------------------------------------------------------------------
 class SistemaMarcacionApp(tk.Tk):
     def __init__(self):
@@ -534,7 +639,6 @@ class SistemaMarcacionApp(tk.Tk):
 
         inicializar_entorno()
 
-        # Cargar empledos locales existentes al arrancar
         reconstruir_mapa_rfid_local(cargar_empleados_locales())
 
         self.current_emp_code = ""
@@ -547,7 +651,6 @@ class SistemaMarcacionApp(tk.Tk):
         self.timer_id = None
         self.t_inicio_solicitud = 0.0
 
-        # Proceso Multiprocessing para Biometría
         self.input_queue = mp.Queue()
         self.output_queue = mp.Queue()
         self.worker_process = mp.Process(
@@ -557,7 +660,7 @@ class SistemaMarcacionApp(tk.Tk):
         )
         self.worker_process.start()
 
-        # Iniciar Hilo Secundario de Sincronización Automática
+        # Hilo de Sincronización Automática en Segundo Plano
         self.sync_activa = True
         self.hilo_sync = threading.Thread(target=self._loop_sincronizacion_periodica, daemon=True)
         self.hilo_sync.start()
@@ -569,7 +672,7 @@ class SistemaMarcacionApp(tk.Tk):
         self.bind_all("<Key>", self.reset_inactivity_timer)
 
         self.frames = {}
-        for F in (PantallaPrincipal, PantallaTeclado, PantallaBiometrica, PantallaHistorial, PantallaEnrolar, PantallaAdminPin, PantallaConfiguracion):
+        for F in (PantallaPrincipal, PantallaTeclado, PantallaBiometrica, PantallaHistorial, PantallaEnrolar, PantallaAdminPin, PantallaConfiguracion, PantallaLog):
             page_name = F.__name__
             frame = F(parent=self.container, controller=self)
             self.frames[page_name] = frame
@@ -582,18 +685,26 @@ class SistemaMarcacionApp(tk.Tk):
         self.show_frame("PantallaPrincipal")
 
     def _loop_sincronizacion_periodica(self):
-        """Sincroniza al iniciar y luego repite la descarga cada 1 hora (3600s)."""
+        """
+        Ciclo en segundo plano:
+        - Revisa y sube marcaciones offline pendientes cada 30 segundos.
+        - Descarga la actualización de empleados.json cada 1 hora (3600 segundos).
+        """
+        contador_segundos = 0
         while self.sync_activa:
             try:
-                sincronizar_empleados_servidor()
+                # 1. Subir marcaciones pendientes si hay red
+                sincronizar_marcaciones_pendientes()
+
+                # 2. Descargar empleados.json cada hora
+                if contador_segundos % INTERVALO_SYNC_SEGUNDOS == 0:
+                    sincronizar_empleados_servidor()
+
             except Exception as e:
-                print(f"[SYNC ERROR] Error en hilo de sincronización: {e}")
-            
-            # Esperar 1 hora
-            for _ in range(INTERVALO_SYNC_SEGUNDOS):
-                if not self.sync_activa:
-                    break
-                time.sleep(1)
+                print(f"[SYNC LOOP ERROR] {e}")
+
+            time.sleep(30)
+            contador_segundos += 30
 
     def show_frame(self, page_name):
         for name, frame in self.frames.items():
@@ -699,22 +810,31 @@ class PantallaPrincipal(tk.Frame):
         admin_btns_frame.pack(pady=(0, 10))
 
         btn_enrolar = tk.Button(
-            admin_btns_frame, text="⚙️  AGREGAR NUEVO COLABORADOR (ADMIN)", font=(FONT_PRIMARY, 8, "bold"),
+            admin_btns_frame, text="⚙️ AGREGAR COLABORADOR", font=(FONT_PRIMARY, 8, "bold"),
             bg=COLOR_CARD, fg=COLOR_PRIMARY, activebackground=COLOR_SECONDARY, activeforeground=COLOR_PRIMARY,
-            bd=1, relief="solid", cursor="hand2", padx=10, pady=5,
+            bd=1, relief="solid", cursor="hand2", padx=8, pady=5,
             command=lambda: self.abrir_admin("PantallaEnrolar")
         )
         btn_enrolar.configure(highlightbackground=COLOR_CARD_BORDER)
-        btn_enrolar.pack(side="left", padx=8)
+        btn_enrolar.pack(side="left", padx=4)
 
         btn_config = tk.Button(
-            admin_btns_frame, text="🌐  CONFIGURAR IP SERVIDOR (ADMIN)", font=(FONT_PRIMARY, 8, "bold"),
+            admin_btns_frame, text="🌐 IP SERVIDOR", font=(FONT_PRIMARY, 8, "bold"),
             bg=COLOR_CARD, fg=COLOR_PRIMARY, activebackground=COLOR_SECONDARY, activeforeground=COLOR_PRIMARY,
-            bd=1, relief="solid", cursor="hand2", padx=10, pady=5,
+            bd=1, relief="solid", cursor="hand2", padx=8, pady=5,
             command=lambda: self.abrir_admin("PantallaConfiguracion")
         )
         btn_config.configure(highlightbackground=COLOR_CARD_BORDER)
-        btn_config.pack(side="left", padx=8)
+        btn_config.pack(side="left", padx=4)
+
+        btn_log = tk.Button(
+            admin_btns_frame, text="📋 LOG / INCIDENTES (ADMIN)", font=(FONT_PRIMARY, 8, "bold"),
+            bg=COLOR_CARD, fg=COLOR_PRIMARY, activebackground=COLOR_SECONDARY, activeforeground=COLOR_PRIMARY,
+            bd=1, relief="solid", cursor="hand2", padx=8, pady=5,
+            command=lambda: self.abrir_admin("PantallaLog")
+        )
+        btn_log.configure(highlightbackground=COLOR_CARD_BORDER)
+        btn_log.pack(side="left", padx=4)
 
     def actualizar_reloj(self):
         ahora = datetime.now()
@@ -845,6 +965,87 @@ class PantallaAdminPin(tk.Frame):
         else:
             self.lbl_status.config(text="❌ PIN Incorrecto", fg=COLOR_DANGER)
             self.display_var.set("")
+
+
+# ----------------------------------------------------------------------
+# VISTA: VISUALIZACIÓN DE BITÁCORA Y LOG DE INCIDENTES (ADMIN)
+# ----------------------------------------------------------------------
+class PantallaLog(tk.Frame):
+    def __init__(self, parent, controller):
+        super().__init__(parent, bg=COLOR_BG)
+        self.controller = controller
+
+        HeaderNutresa(self).pack(fill="x")
+
+        lbl_title = tk.Label(self, text="BITÁCORA DE INCIDENCIAS Y AUDITORÍA DE FALLOS", font=(FONT_PRIMARY, 11, "bold"), fg=COLOR_PRIMARY, bg=COLOR_BG)
+        lbl_title.pack(pady=4)
+
+        card_table = tk.Frame(self, bg=COLOR_CARD, bd=1, relief="solid", highlightthickness=0)
+        card_table.configure(highlightbackground=COLOR_CARD_BORDER)
+        card_table.pack(pady=4, padx=20, fill="both", expand=True)
+
+        columns = ("fecha", "emp_id", "operacion", "motivo", "detalle")
+        self.tree = ttk.Treeview(card_table, columns=columns, show="headings", height=10)
+        self.tree.heading("fecha", text="FECHA Y HORA")
+        self.tree.heading("emp_id", text="ID / RFID")
+        self.tree.heading("operacion", text="OPERACIÓN")
+        self.tree.heading("motivo", text="MOTIVO FALLO")
+        self.tree.heading("detalle", text="DETALLE TÉCNICO")
+
+        self.tree.column("fecha", anchor="center", width=130)
+        self.tree.column("emp_id", anchor="center", width=100)
+        self.tree.column("operacion", anchor="center", width=110)
+        self.tree.column("motivo", anchor="w", width=160)
+        self.tree.column("detalle", anchor="w", width=240)
+
+        scrollbar_y = ttk.Scrollbar(card_table, orient="vertical", command=self.tree.yview)
+        scrollbar_x = ttk.Scrollbar(card_table, orient="horizontal", command=self.tree.xview)
+        self.tree.configure(yscroll=scrollbar_y.set, xscroll=scrollbar_x.set)
+
+        self.tree.pack(side="top", fill="both", expand=True, padx=8, pady=(8, 0))
+        scrollbar_y.pack(side="right", fill="y")
+        scrollbar_x.pack(side="bottom", fill="x", padx=8, pady=(0, 8))
+
+        btn_bar = tk.Frame(self, bg=COLOR_BG)
+        btn_bar.pack(pady=8)
+
+        btn_refresh = tk.Button(btn_bar, text="🔄 REFRESCAR LOG", font=(FONT_PRIMARY, 9, "bold"), bg=COLOR_PRIMARY, fg="#FFFFFF", activebackground=COLOR_PRIMARY_HOVER, activeforeground="#FFFFFF", bd=0, relief="flat", padx=12, pady=6, cursor="hand2", command=self.cargar_log)
+        btn_refresh.pack(side="left", padx=5)
+
+        btn_clear = tk.Button(btn_bar, text="🗑️ LIMPIAR LOG", font=(FONT_PRIMARY, 9, "bold"), bg=COLOR_DANGER, fg="#FFFFFF", activebackground=COLOR_DANGER_HOVER, activeforeground="#FFFFFF", bd=0, relief="flat", padx=12, pady=6, cursor="hand2", command=self.limpiar_log)
+        btn_clear.pack(side="left", padx=5)
+
+        btn_volver = tk.Button(btn_bar, text="← REGRESAR AL MENÚ", font=(FONT_PRIMARY, 9, "bold"), bg=COLOR_MUTED, fg="#FFFFFF", activebackground=COLOR_TEXT_DARK, activeforeground="#FFFFFF", bd=0, relief="flat", padx=12, pady=6, cursor="hand2", command=lambda: controller.show_frame("PantallaPrincipal"))
+        btn_volver.pack(side="left", padx=5)
+
+    def on_show(self):
+        self.cargar_log()
+
+    def cargar_log(self):
+        for item in self.tree.get_children():
+            self.tree.delete(item)
+
+        if not os.path.exists(LOG_FILE):
+            return
+
+        try:
+            with open(LOG_FILE, "r", encoding="utf-8") as f:
+                reader = csv.reader(f)
+                header = next(reader, None)
+                rows = list(reader)
+                for row in reversed(rows):
+                    if len(row) >= 5:
+                        self.tree.insert("", "end", values=(row[0], row[1], row[2], row[3], row[4]))
+        except Exception as e:
+            print(f"[LOG DISPLAY ERROR] {e}")
+
+    def limpiar_log(self):
+        if os.path.exists(LOG_FILE):
+            try:
+                os.remove(LOG_FILE)
+            except Exception:
+                pass
+        self.cargar_log()
 
 
 # ----------------------------------------------------------------------
@@ -1030,6 +1231,7 @@ class PantallaConfiguracion(tk.Frame):
         if exito:
             self.lbl_status.config(text=mensaje_respuesta, fg=COLOR_PRIMARY)
             threading.Thread(target=sincronizar_empleados_servidor, daemon=True).start()
+            threading.Thread(target=sincronizar_marcaciones_pendientes, daemon=True).start()
         else:
             self.lbl_status.config(
                 text=f"❌ Imposible conectar al puerto HTTP en {base_url}\n"
@@ -1048,6 +1250,7 @@ class PantallaConfiguracion(tk.Frame):
         guardar_configuracion(ip, port)
         self.lbl_status.config(text="✓ Configuración de Servidor e IP guardada correctamente.", fg=COLOR_PRIMARY)
         threading.Thread(target=sincronizar_empleados_servidor, daemon=True).start()
+        threading.Thread(target=sincronizar_marcaciones_pendientes, daemon=True).start()
         self.after(1200, lambda: self.controller.show_frame("PantallaPrincipal"))
 
 
@@ -1172,8 +1375,15 @@ class PantallaBiometrica(tk.Frame):
         self.lbl_status = tk.Label(self.card, text="INICIANDO CÁMARA...", font=(FONT_PRIMARY, 10, "bold"), fg=COLOR_MUTED, bg=COLOR_CARD, wraplength=400)
         self.lbl_status.pack(pady=(0, 10))
 
-        self.btn_cancelar = tk.Button(self, text="CANCELAR", font=(FONT_PRIMARY, 10, "bold"), bg=COLOR_MUTED, fg="#FFFFFF", bd=0, relief="flat", padx=15, pady=8, cursor="hand2", command=lambda: controller.show_frame("PantallaPrincipal"))
+        self.btn_cancelar = tk.Button(self, text="CANCELAR", font=(FONT_PRIMARY, 10, "bold"), bg=COLOR_MUTED, fg="#FFFFFF", bd=0, relief="flat", padx=15, pady=8, cursor="hand2", command=self.cancelar_verificacion)
         self.btn_cancelar.pack(pady=10)
+
+    def cancelar_verificacion(self):
+        emp_id = self.controller.current_emp_code
+        accion = self.controller.current_action
+        if not self.verificado and emp_id:
+            registrar_log_incidente(emp_id, accion, "Cancelación Manual", "El usuario presionó el botón CANCELAR")
+        self.controller.show_frame("PantallaPrincipal")
 
     def on_show(self):
         self.verificado = False
@@ -1187,6 +1397,7 @@ class PantallaBiometrica(tk.Frame):
         if self.vector_registrado is None:
             self.lbl_sub.config(text=f"COLABORADOR ID: {emp_id}")
             self.lbl_status.config(text=f"❌ ERROR BIOMÉTRICO: No se encontró el rostro del colaborador.", fg=COLOR_DANGER)
+            registrar_log_incidente(emp_id, self.controller.current_action, "Vector Inexistente", "No hay vector facial disponible para comparar")
             self.btn_cancelar.pack(pady=10)
             return
 
@@ -1519,6 +1730,7 @@ class PantallaEnrolar(tk.Frame):
         encodings = face_recognition.face_encodings(self.ultimo_frame)
         if len(encodings) == 0:
             self.lbl_status.config(text="❌ No se detectó rostro.", fg=COLOR_DANGER)
+            registrar_log_incidente(emp_id, "ENROLAMIENTO", "Rostro No Detectado", "Cámara no detectó cara limpia")
             return
 
         encoding_np = encodings[0]
