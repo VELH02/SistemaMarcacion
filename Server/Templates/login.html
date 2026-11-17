@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row justify-content-center mt-5">
+    <div class="col-md-4">
+        <div class="card shadow border-0">
+            <div class="card-header bg-white text-center py-4 border-bottom">
+                <img src="{{ url_for('static', filename='logo.png') }}" alt="Alicapsa" height="60" class="mb-2">
+                <h6 class="text-muted mb-0 fw-bold">CONTROL DE ASISTENCIA</h6>
+            </div>
+            <div class="card-body p-4">
+                <form method="POST">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Usuario / Perfil</label>
+                        <select name="usuario" class="form-select" required>
+                            <option value="">Seleccione su perfil...</option>
+                            {% for u_key, u_val in usuarios.items() %}
+                                <option value="{{ u_key }}">{{ u_val.nombre }} ({{ u_val.area }})</option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Contraseña</label>
+                        <input type="password" name="password" class="form-control" required>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100 py-2 fw-bold">Ingresar al Sistema</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

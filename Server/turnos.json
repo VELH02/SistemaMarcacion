@@ -1,0 +1,17 @@
+{
+    "T1": {
+        "nombre": "Turno Mañana",
+        "entrada": "06:00:00",
+        "salida": "14:30:00"
+    },
+    "T2": {
+        "nombre": "Turno Tarde",
+        "entrada": "14:00:00",
+        "salida": "22:30:00"
+    },
+    "T3": {
+        "nombre": "Turno Noche",
+        "entrada": "22:00:00",
+        "salida": "06:30:00"
+    }
+}

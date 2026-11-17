@@ -1,0 +1,188 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Formulario para crear colaborador -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Nuevo Colaborador</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/colaboradores" enctype="multipart/form-data">
+                    <label class="form-label">Fecha de ingreso<input type="date" name="fecha_ingreso" class="form-control"></label>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Código del Empleado (ID)</label>
+                        <input type="text" name="emp_id" class="form-control" placeholder="Ej: EMP-001" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre</label>
+                        <input type="text" name="nombre" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Apellido</label>
+                        <input type="text" name="apellido" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Tarjeta RFID (Carnet)</label>
+                        <input type="text" name="rfid" class="form-control" placeholder="Ej: 0012345678">
+                        <small class="text-muted">Código impreso o leído del carnet físico.</small>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Área Asignada</label>
+                        <select name="area" class="form-select" required>
+                            {% for a in areas %}
+                                {% if session.get('area') == 'TODAS' or session.get('area') == a %}
+                                    <option value="{{ a }}">{{ a }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="mb-4">
+                        <label class="form-label fw-bold">Archivo Biométrico (.npy)</label>
+                        <input type="file" name="archivo_npy" class="form-control" accept=".npy">
+                        <small class="text-muted">La matriz facial se consolidará directamente en JSON.</small>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100">Registrar Colaborador</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Colaboradores -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Lista de Colaboradores ({{ empleados | length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Código</th>
+                                <th>Nombre Completo</th>
+                                <th>Área</th>
+                                <th>Tarjeta RFID</th>
+                                <th class="text-center">Biometría</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for code, emp in empleados.items() %}
+                            <tr>
+                                <td><code>{{ code }}</code></td>
+                                <td><strong>{{ emp.nombre }} {{ emp.apellido }}</strong></td>
+                                <td><span class="badge bg-secondary">{{ emp.area }}</span></td>
+                                <td>
+                                    {% if emp.rfid %}
+                                        <code class="text-dark bg-light px-2 py-1 rounded border">{{ emp.rfid }}</code>
+                                    {% else %}
+                                        <span class="text-muted small">Sin asignar</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    {% if emp.vector_facial and emp.vector_facial | length > 0 %}
+                                        <span class="badge bg-success" title="Matriz facial consolidada en JSON">✓ Registrada</span>
+                                    {% else %}
+                                        <span class="badge bg-light text-muted border">Pendiente</span>
+                                    {% endif %}
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditar{{ code }}">
+                                            ✏️ Editar
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminar{{ code }}">
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal Editar -->
+                                    <div class="modal fade text-start" id="modalEditar{{ code }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="/colaboradores/editar/{{ code }}" enctype="multipart/form-data">
+                                                    <label class="form-label">Fecha de ingreso<input type="date" name="fecha_ingreso" class="form-control" value="{{ emp.get('fecha_ingreso','') }}"></label>
+                                                    <div class="modal-header card-header-custom">
+                                                        <h5 class="modal-title">Editar Colaborador: {{ code }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Código del Colaborador (ID)</label>
+                                                            <input type="text" name="nuevo_emp_id" class="form-control" value="{{ code }}" required>
+                                                            <small class="text-muted">Si modifica el código, su histórico se actualizará automáticamente.</small>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Nombre</label>
+                                                            <input type="text" name="nombre" class="form-control" value="{{ emp.nombre }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Apellido</label>
+                                                            <input type="text" name="apellido" class="form-control" value="{{ emp.apellido }}" required>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Tarjeta RFID (Carnet)</label>
+                                                            <input type="text" name="rfid" class="form-control" value="{{ emp.rfid | default('') }}" placeholder="Ej: 0012345678">
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Área</label>
+                                                            <select name="area" class="form-select" required>
+                                                                {% for a in areas %}
+                                                                    {% if session.get('area') == 'TODAS' or session.get('area') == a %}
+                                                                        <option value="{{ a }}" {% if emp.area == a %}selected{% endif %}>{{ a }}</option>
+                                                                    {% endif %}
+                                                                {% endfor %}
+                                                            </select>
+                                                        </div>
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Actualizar Matriz Facial (.npy)</label>
+                                                            <input type="file" name="archivo_npy" class="form-control" accept=".npy">
+                                                            <small class="text-muted">Dejar vacío para conservar los datos biométricos actuales.</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-custom">Guardar Cambios</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Eliminar -->
+                                    <div class="modal fade text-start" id="modalEliminar{{ code }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="/colaboradores/eliminar/{{ code }}">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title">Confirmar Eliminación</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>¿Está seguro de que desea eliminar al colaborador <strong>{{ emp.nombre }} {{ emp.apellido }}</strong> (<code>{{ code }}</code>)?</p>
+                                                        <p class="text-danger small mb-0">Esta acción removerá su ficha de personal y sus datos biométricos consolidados.</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-danger">Eliminar Definitivamente</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="6" class="text-center py-4 text-muted">No hay colaboradores registrados en esta área.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

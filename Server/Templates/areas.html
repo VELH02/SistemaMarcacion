@@ -1,0 +1,115 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="row">
+    <!-- Formulario para crear nueva área -->
+    <div class="col-md-4 mb-4">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Agregar Nueva Área</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="/admin/areas/crear">
+                    <div class="mb-3">
+                        <label class="form-label fw-bold">Nombre del Área / Departamento</label>
+                        <input type="text" name="nombre_area" class="form-control" placeholder="Ej: GESTION, CALIDAD, RRHH" required>
+                        <small class="text-muted">Se registrará automáticamente en mayúsculas.</small>
+                    </div>
+                    <button type="submit" class="btn btn-custom w-100">Crear Área</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de Áreas Existentes -->
+    <div class="col-md-8">
+        <div class="card shadow-sm">
+            <div class="card-header card-header-custom">
+                <h5 class="mb-0">Áreas de la Empresa ({{ areas | length }})</h5>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th>Nombre del Área</th>
+                                <th class="text-center">Colaboradores Activos</th>
+                                <th class="text-center">Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for a in areas %}
+                            <tr>
+                                <td><strong>{{ a }}</strong></td>
+                                <td class="text-center">
+                                    <span class="badge bg-secondary">{{ conteo.get(a, 0) }} asignados</span>
+                                </td>
+                                <td class="text-center">
+                                    <div class="d-inline-flex gap-1">
+                                        <button type="button" class="btn btn-sm btn-outline-success" data-bs-toggle="modal" data-bs-target="#modalEditarArea{{ loop.index }}">
+                                            ✏️ Renombrar
+                                        </button>
+                                        <button type="button" class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#modalEliminarArea{{ loop.index }}" {% if conteo.get(a, 0) > 0 %}disabled title="Reasigne primero a los colaboradores asignados"{% endif %}>
+                                            🗑️ Eliminar
+                                        </button>
+                                    </div>
+
+                                    <!-- Modal Editar Área -->
+                                    <div class="modal fade text-start" id="modalEditarArea{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="/admin/areas/editar/{{ a }}">
+                                                    <div class="modal-header card-header-custom">
+                                                        <h5 class="modal-title">Renombrar Área: {{ a }}</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <div class="mb-3">
+                                                            <label class="form-label fw-bold">Nuevo Nombre</label>
+                                                            <input type="text" name="nombre_area" class="form-control" value="{{ a }}" required>
+                                                            <small class="text-muted">Los colaboradores y usuarios vinculados se actualizarán automáticamente.</small>
+                                                        </div>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-custom">Guardar Cambios</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Modal Eliminar Área -->
+                                    <div class="modal fade text-start" id="modalEliminarArea{{ loop.index }}" tabindex="-1" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <form method="POST" action="/admin/areas/eliminar/{{ a }}">
+                                                    <div class="modal-header bg-danger text-white">
+                                                        <h5 class="modal-title">Confirmar Eliminación de Área</h5>
+                                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+                                                    </div>
+                                                    <div class="modal-body">
+                                                        <p>¿Está seguro de que desea eliminar el área <strong>{{ a }}</strong>?</p>
+                                                    </div>
+                                                    <div class="modal-footer">
+                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                                                        <button type="submit" class="btn btn-danger">Eliminar Área</button>
+                                                    </div>
+                                                </form>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </td>
+                            </tr>
+                            {% else %}
+                            <tr><td colspan="3" class="text-center py-4 text-muted">No hay áreas configuradas.</td></tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

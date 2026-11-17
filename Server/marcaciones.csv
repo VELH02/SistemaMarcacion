@@ -1,0 +1,27 @@
+ID_Registro,ID_Personal,Nombre,Area,Tipo,Fecha_Hora,IP_Origen,Estado,Nota
+e5de853a,14244,Colaborador 14244,OPERACIONES,ENTRADA,2026-10-15 06:05:43,10.120.4.56,Aprobado,Modificado por admin
+6a63ac93,14244,Colaborador 14244,OPERACIONES,ENTRADA,2026-10-16 09:36:20,10.120.4.56,Aprobado,
+fbf70213,14244,Colaborador 14244,OPERACIONES,SALIDA,2026-10-16 09:36:45,10.120.4.56,Aprobado,
+1640cf5c,14244,Colaborador 14244,OPERACIONES,ENTRADA,2026-10-16 10:54:57,10.120.4.56,Aprobado,
+d55b43f3,14244,Colaborador 14244,OPERACIONES,SALIDA,2026-10-16 10:55:10,10.120.4.56,Aprobado,
+9acae676,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-15 15:00:00,Ajuste Manual,Aprobado,Modificado por admin
+a8fb6db5,14340,Eduin Er Malo,MANTENIMIENTO,ENTRADA,2026-10-17 09:11:28,10.120.4.56,Aprobado,Modificado por admin
+96f1b1b2,14250,Colaborador 14250,MANTENIMIENTO,ENTRADA,2026-10-17 11:57:11,10.120.4.56,Aprobado,
+c666bdd4,14250,Colaborador 14250,MANTENIMIENTO,SALIDA,2026-10-17 11:57:29,10.120.4.56,Aprobado,
+4b36be21,14244,Edwin Aponte,MANTENIMIENTO,ENTRADA,2026-10-17 06:00:00,10.120.4.56,Aprobado,Modificado por admin
+985d9e6c,14340,Eduin Er Malo,MANTENIMIENTO,SALIDA,2026-10-17 18:00:00,Ajuste Manual,Aprobado,Añadido por admin
+1f1919d1,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,Ajuste Manual,Aprobado,Modificado por admin
+6b9f2423,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,10.120.4.56,Aprobado,Modificado por admin
+32948231,14250,Eduin Er Bueno,MANTENIMIENTO,SALIDA,2026-10-17 14:41:06,10.120.4.56,Aprobado,(Red Caída) (Sincronizado Offline)
+c852b34c,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,10.120.4.56,Aprobado,Modificado por admin
+c6cc0393,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,10.120.4.56,Aprobado,Modificado por admin
+b36e4033,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,10.120.4.56,Aprobado,Modificado por admin
+2d431db7,3128,Colaborador 3128,OPERACIONES,ENTRADA,2026-10-17 15:14:24,10.120.4.56,Aprobado,(Red Caída) (Sincronizado Offline)
+7987b27a,3128,Colaborador 3128,OPERACIONES,SALIDA,2026-10-17 15:14:24,10.120.4.56,Aprobado,(Red Caída) (Sincronizado Offline)
+9d34b328,14244,Edwin Aponte,MANTENIMIENTO,SALIDA,2026-10-17 16:04:12,10.120.4.56,Aprobado,Modificado por admin
+fef93598,14244,Edwin Aponte,MANTENIMIENTO,ENTRADA,2026-10-19 11:19:41,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)
+e1e77459,963,Colaborador 963,OPERACIONES,ENTRADA,2026-11-02 11:02:41,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)
+0caafe90,963,Colaborador 963,OPERACIONES,SALIDA,2026-11-02 11:03:52,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)
+4a7c72e5,14244,Edwin Aponte,MANTENIMIENTO,ENTRADA,2026-10-19 11:19:41,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)
+ddc3128a,963,Colaborador 963,OPERACIONES,ENTRADA,2026-11-02 11:02:41,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)
+649577bb,963,Colaborador 963,OPERACIONES,SALIDA,2026-11-02 11:03:52,10.120.4.64,Aprobado,(Red Caída) (Sincronizado Offline)

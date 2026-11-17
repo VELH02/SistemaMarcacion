@@ -1,0 +1,489 @@
+[2026-11-02 11:17:38] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:17:41] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:20:38] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-02 11:20:44] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-02 11:21:46] [IP: 10.120.4.64] Sincronización completa: 6 colaboradores enviados a 10.120.4.64
+[2026-11-02 11:21:46] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 14244 (Edwin Aponte) - ENTRADA [Hora Cliente: 2026-10-19 11:19:41]
+[2026-11-02 11:21:46] [IP: 10.120.4.64] ✨ AUTO-REGISTRO: Colaborador nuevo 963 creado automáticamente al marcar.
+[2026-11-02 11:21:46] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 963 (Colaborador 963) - ENTRADA [Hora Cliente: 2026-11-02 11:02:41]
+[2026-11-02 11:21:46] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 963 (Colaborador 963) - SALIDA [Hora Cliente: 2026-11-02 11:03:52]
+[2026-11-02 11:22:16] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 14244 (Edwin Aponte) - ENTRADA [Hora Cliente: 2026-10-19 11:19:41]
+[2026-11-02 11:22:16] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 963 (Colaborador 963) - ENTRADA [Hora Cliente: 2026-11-02 11:02:41]
+[2026-11-02 11:22:17] [IP: 10.120.4.64] MARCACIÓN REGISTRADA: 963 (Colaborador 963) - SALIDA [Hora Cliente: 2026-11-02 11:03:52]
+[2026-11-02 11:25:27] [IP: Local] Nueva área creada: ADMINISTRACIÓN
+[2026-11-02 11:25:36] [IP: Local] Nueva área creada: VENTAS
+[2026-11-02 11:26:42] [IP: Local] Colaborador 963 actualizado (Código final: 963).
+[2026-11-02 11:30:32] [IP: Local] Jefe de área 'admin' exportó Nómina RRHH con Turnos (2026-10-19 al 2026-11-02).
+[2026-11-02 11:40:20] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:40:22] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:44:25] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:44:27] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:49:23] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 11:49:25] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 14:38:27] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 14:38:30] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 14:43:19] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-02 14:43:24] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-16 21:12:00] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:12:00] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:12:00] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:12:00] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:12:00] [IP: Local] Jefe de área 'admin' (TODAS) exportó Asistencias (2026-11-02 al 2026-11-16).
+[2026-11-16 21:12:00] [IP: Local] Jefe de área 'admin' exportó Nómina RRHH con Turnos (2026-11-02 al 2026-11-16).
+[2026-11-16 21:12:00] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:12:31] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:12:32] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:12:32] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:12:32] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:12:32] [IP: Local] Jefe de área 'admin' (TODAS) exportó Asistencias (2026-11-02 al 2026-11-16).
+[2026-11-16 21:12:32] [IP: Local] Jefe de área 'admin' exportó Nómina RRHH con Turnos (2026-11-02 al 2026-11-16).
+[2026-11-16 21:12:32] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:34:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:34:41] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:34:41] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:34:42] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:35:31] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:35:31] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:35:31] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:35:31] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:35:31] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:37:26] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:37:26] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:37:26] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:37:28] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:37:28] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:37:28] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:37:28] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:37:29] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:39:12] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:39:12] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:39:12] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:39:15] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:39:15] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:39:15] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:39:15] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:39:15] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:42:43] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:42:43] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:42:43] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:42:45] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:42:45] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:42:45] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:42:45] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:42:45] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:44:45] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:44:45] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:44:45] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:44:47] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:44:47] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:44:47] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:44:47] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:44:47] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:47:11] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:47:11] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:47:11] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:47:12] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:47:14] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:47:14] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:47:14] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:47:14] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:47:14] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:48:16] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:48:16] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:48:16] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:48:17] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:48:18] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:48:18] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:48:18] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:48:18] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:48:18] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:54:20] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:54:20] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:54:20] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:54:20] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 21:54:20] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:54:21] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:54:22] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:54:22] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:54:22] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:54:22] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:54:22] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:56:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:05] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:56:05] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:56:05] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 21:56:05] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:56:06] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:56:06] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 21:56:06] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:06] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:07] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:07] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:56:07] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:56:07] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:56:07] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 21:56:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:49] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 21:56:49] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:56:49] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 21:56:49] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:56:50] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 21:56:50] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 21:56:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:51] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 21:56:51] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 21:56:51] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 21:56:51] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 21:56:51] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:07:29] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:07:29] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:07:29] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:07:29] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:07:29] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:29] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:07:29] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:07:29] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:29] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:07:29] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:07:32] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:32] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:07:32] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:07:32] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:07:32] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:07:33] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:07:33] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:07:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:07:36] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:07:36] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:07:36] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:07:36] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:08:59] [IP: Sistema] Servidor modular iniciado en puerto 5000
+[2026-11-16 22:12:12] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:16:59] [IP: Local] Usuario 'admin' cerró sesión.
+[2026-11-16 22:17:12] [IP: Local] Usuario 'mantenimiento' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:20:30] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:20:30] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:20:30] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:30] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:20:30] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:20:31] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:32] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:32] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:20:32] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:20:32] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:20:32] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:20:33] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:20:33] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:20:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:20:35] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:20:35] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:20:35] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:20:35] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:34:03] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:34:03] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:34:03] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:34:03] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:34:03] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:03] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:34:03] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:34:03] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:04] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:34:04] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:34:04] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:05] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:34:05] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:34:05] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:34:05] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:34:06] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:34:06] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:34:06] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:06] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:07] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:34:07] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:34:07] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:34:07] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:34:07] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:36:20] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:36:20] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:36:20] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:36:20] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:36:20] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:36:20] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:20] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:21] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:21] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:22] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:22] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:23] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:24] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:24] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:36:24] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:36:24] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:36:24] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:36:25] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:36:25] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:36:25] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:25] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:26] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:36:27] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:36:27] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:36:27] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:36:27] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:37:33] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:37:33] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:37:33] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:37:33] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:37:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:33] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:37:33] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:37:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:33] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:37:33] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:37:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:35] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:37:35] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:37:35] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 22:37:35] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 22:37:35] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 22:37:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:36] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:37] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:37] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:37:37] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:37:37] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:37:37] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:37:38] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:37:38] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:37:38] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:38] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:37:40] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:37:40] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:37:40] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:37:40] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:40:02] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:40:02] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:40:02] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:40:02] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:40:02] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:02] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:40:02] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:40:02] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:03] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:40:03] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:40:03] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:03] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:04] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:04] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:04] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:05] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:40:05] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:40:05] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 22:40:05] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 22:40:05] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 22:40:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:05] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:06] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:07] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:07] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:40:07] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:40:07] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:40:07] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:40:08] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:40:08] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:40:08] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:09] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:10] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:40:10] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:40:10] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:40:10] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:40:11] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:42:32] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:42:32] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 22:42:32] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 22:42:32] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 22:42:32] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:32] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 22:42:32] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:42:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:33] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 22:42:33] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 22:42:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:33] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:34] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:35] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:42:35] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:42:35] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 22:42:35] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 22:42:35] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 22:42:35] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:36] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:37] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:38] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:38] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 22:42:38] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:42:38] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:42:38] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:42:39] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 22:42:39] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 22:42:39] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 22:42:41] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 22:42:41] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 22:42:41] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 22:42:41] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 22:44:56] [IP: Local] Marcación ajustada para EMP-002 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:45:11] [IP: Local] Marcación ajustada para EMP-002 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:45:50] [IP: Local] Marcación ajustada para EMP-002 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:46:08] [IP: Local] Marcación ajustada para EMP-002 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:46:26] [IP: Local] Marcación ajustada para 14244 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:48:38] [IP: Local] Marcación ajustada para 14340 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:48:51] [IP: Local] Marcación ajustada para 14250 el día 2026-11-16 por mantenimiento
+[2026-11-16 22:49:09] [IP: Local] Marcación ajustada para EMP-002 el día 2026-11-15 por mantenimiento
+[2026-11-16 23:02:49] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 23:02:49] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 23:02:49] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 23:02:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 23:02:49] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 23:02:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 23:02:50] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 23:02:50] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:51] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:02:52] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:53] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:54] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:02:54] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 23:02:54] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 23:02:54] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:02:54] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 23:04:39] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:04:39] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 23:04:39] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 23:04:39] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 23:04:39] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:39] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 23:04:39] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:04:39] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:39] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 23:04:39] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 23:04:39] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:40] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:41] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:04:41] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:04:41] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 23:04:41] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 23:04:41] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 23:04:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:41] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:42] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:43] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:43] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:04:43] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:04:43] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:04:43] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:04:44] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:04:44] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:04:44] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:45] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:47] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:47] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:04:47] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 23:04:47] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 23:04:47] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:04:48] [IP: Local] Respaldo SQLite creado por admin
+[2026-11-16 23:06:47] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:06:47] [IP: Local] Nueva área creada: CALIDAD
+[2026-11-16 23:06:47] [IP: Local] Nuevo usuario creado: calidad asignado a CALIDAD
+[2026-11-16 23:06:47] [IP: Local] Nuevo usuario creado: rh asignado a TODAS
+[2026-11-16 23:06:47] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:47] [IP: Local] Usuario 'rh' ha iniciado sesión.
+[2026-11-16 23:06:48] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:06:48] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:48] [IP: Local] Usuario jefe actualizado (Área: TODAS)
+[2026-11-16 23:06:48] [IP: Local] Usuario eliminado: jefe
+[2026-11-16 23:06:48] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:48] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:49] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:50] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:06:50] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:06:50] [IP: Local] Vector biométrico actualizado en JSON para 001
+[2026-11-16 23:06:50] [IP: Local] Colaborador 001 actualizado (Código final: 001).
+[2026-11-16 23:06:50] [IP: Local] Colaborador 002 actualizado (Código final: 002).
+[2026-11-16 23:06:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:50] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:51] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:52] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:52] [IP: Local] Usuario 'jefe' cerró sesión.
+[2026-11-16 23:06:52] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:06:52] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:06:52] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:06:53] [IP: Local] Usuario 'rrhh' ha iniciado sesión.
+[2026-11-16 23:06:53] [IP: Local] Usuario 'rrhh' cerró sesión.
+[2026-11-16 23:06:53] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:53] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:56] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:56] [IP: Local] Usuario 'jefe' ha iniciado sesión.
+[2026-11-16 23:06:56] [IP: 127.0.0.1] Marcación registrada: José Pérez - ENTRADA a las 2026-10-15 06:00:00
+[2026-11-16 23:06:56] [IP: 127.0.0.1] Trama entrante texto: '001,SALIDA,2026-10-15 14:30:00'
+[2026-11-16 23:06:56] [IP: Local] Usuario 'admin' ha iniciado sesión.
+[2026-11-16 23:06:56] [IP: Local] Respaldo SQLite creado por admin

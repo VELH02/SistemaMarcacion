@@ -1,0 +1,32 @@
+{
+    "admin": {
+        "pass": "admin",
+        "area": "TODAS",
+        "nombre": "Administrador General"
+    },
+    "produccion": {
+        "pass": "1234",
+        "area": "PRODUCCION",
+        "nombre": "Jefe de Producción"
+    },
+    "mantenimiento": {
+        "pass": "1234",
+        "area": "MANTENIMIENTO",
+        "nombre": "Jefe de Mantenimiento"
+    },
+    "saneamiento": {
+        "pass": "1234",
+        "area": "SANEAMIENTO",
+        "nombre": "Jefe de Saneamiento"
+    },
+    "operaciones": {
+        "pass": "1234",
+        "area": "OPERACIONES",
+        "nombre": "Jefe de Operaciones"
+    },
+    "logistica": {
+        "pass": "1234",
+        "area": "LOGISTICA",
+        "nombre": "Jefe de Logística"
+    }
+}

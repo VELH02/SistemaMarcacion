@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+<h4>Turnos definidos por Recursos Humanos</h4>
+<p>El coordinador asigna estos turnos desde <a href="/planificacion">la planificación semanal</a>. La fecha de la jornada es la de entrada.</p>
+<div class="row g-3"><div class="col-lg-5">
+{% if puede_editar %}
+<form method="post" class="card card-body">
+<h5>{{ 'Editar' if edit_id else 'Registrar' }} turno</h5>
+<label class="form-label">Código<input name="turno_id" class="form-control" required value="{{ edit_id }}"></label>
+<label class="form-label">Nombre<input name="nombre" class="form-control" required value="{{ edit.get('nombre','') }}"></label>
+<label class="form-label">Entrada<input type="time" step="1" name="entrada" class="form-control" required value="{{ edit.get('entrada','') }}"></label>
+<label class="form-label">Salida<input type="time" step="1" name="salida" class="form-control" required value="{{ edit.get('salida','') }}"></label>
+<label class="form-label">Descansos (uno por línea: 02:00-02:30)<textarea name="descansos" class="form-control" rows="3">{% for a,b in edit.get('descansos',[]) %}{{ a }}-{{ b }}{{ '
+' }}{% endfor %}</textarea></label>
+<p class="small text-muted">Dejar vacío significa que todo el horario cuenta como trabajo. Se pueden registrar varios descansos distribuidos. RH debe validar cuándo el descanso cuenta como tiempo de trabajo.</p>
+<label class="form-check mb-3"><input type="checkbox" name="descanso_remunerado" class="form-check-input" {% if edit.get('descanso_remunerado') %}checked{% endif %}> Los descansos cuentan como tiempo de trabajo remunerado</label>
+<button class="btn btn-custom">Guardar y validar turno</button>
+<p class="small mt-2 mb-0">Las asignaciones existentes conservan su horario. Para cambiarlo, reasigne explícitamente el día.</p>
+</form>{% else %}<div class="alert alert-info">La creación y edición están reservadas a RH y al administrador.</div>{% endif %}
+</div><div class="col-lg-7"><div class="table-responsive"><table class="table table-striped bg-white"><thead><tr><th>Código</th><th>Turno</th><th>Horario</th><th>Jornada</th><th>Horas ordinarias</th><th>Estado</th></tr></thead><tbody>
+{% for key,t in turnos.items() %}<tr><td>{{ key }}</td><td>{{ t.nombre }}</td><td>{{ t.entrada }} → {{ t.salida }}</td><td>{{ t.get('jornada','Por validar') }}</td><td>{{ t.get('horas_ordinarias','—') }}</td><td>{% if t.get('configurado') %}Validado{% else %}<span class="text-danger">RH debe revisar descansos</span>{% endif %}{% if puede_editar %}<br><a href="/turnos?editar={{ key|urlencode }}">Editar</a>{% endif %}</td></tr>{% endfor %}
+</tbody></table></div><div class="alert alert-secondary">Límites ordinarios: 8 h diurnas, 7.5 h mixtas y 7 h nocturnas. Si el horario efectivo los supera, el exceso se identifica como HE y requiere revisión. Siete horas nocturnas completas equivalen a ocho diurnas para la base salarial aplicable.</div></div></div>
+{% endblock %}
