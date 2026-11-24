@@ -25,11 +25,16 @@ TIMEOUT_INACTIVIDAD_SEGUNDOS = 30
 DEPTOS_DISPONIBLES = [
     "OPERACIONES",
     "LOGÍSTICA",
-    "ADMINISTRACIÓN",
+    "DHO",
     "VENTAS",
     "MANTENIMIENTO",
     "PRODUCCION",
     "SANEAMIENTO",
+    "IP",
+    "SIG",
+    "PLANEACION",
+    "LABORATORIO",
+
 ]
 
 # Tipografía principal según sistema operativo

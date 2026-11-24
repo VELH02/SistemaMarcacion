@@ -32,44 +32,108 @@ from storage import (
 
 urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
+# Evita ejecuciones simultáneas de sincronización (previene duplicados y pérdida de cola)
+SYNC_LOCK = threading.Lock()
+
+
+def _safe_json(res):
+    """Devuelve el JSON de la respuesta o un dict vacío si el cuerpo no es JSON válido."""
+    try:
+        return res.json()
+    except ValueError:
+        return {}
+
+
+def _clave_marcacion(m):
+    """Identificador único para reconciliar marcaciones pendientes sin perder registros nuevos."""
+    return (
+        str(m.get("Empleado_ID", "")).strip().upper(),
+        str(m.get("Tipo_Marcacion", "")).strip().upper(),
+        str(m.get("Fecha_Hora", "")).strip(),
+    )
+
+
+def servidor_disponible(timeout=3):
+    """Verifica rápidamente si el servidor REST responde."""
+    server_url = get_server_url().rstrip("/")
+    for url in (f"{server_url}/ping", f"{server_url}/empleados"):
+        try:
+            res = requests.get(url, timeout=timeout, verify=False)
+            if res.status_code in (200, 201, 400, 404, 405):
+                return True
+        except requests.exceptions.RequestException:
+            continue
+    return False
+
 
 # ----------------------------------------------------------------------
 # SINCRONIZACIÓN DE COLAS OFFLINE Y BASE DE EMPLEADOS
 # ----------------------------------------------------------------------
 def sincronizar_enrolamientos_pendientes():
-    """Sube al servidor todos los colaboradores enrolados mientras no había red."""
-    pendientes = cargar_enrolamientos_pendientes()
+    """
+    Sube al servidor todos los colaboradores enrolados en modo offline.
+    Retorna True si el servidor respondió (o no había pendientes), False si hubo fallo de red.
+    """
+    with ARCHIVOS_LOCK:
+        pendientes = cargar_enrolamientos_pendientes()
     if not pendientes:
-        return
+        return True
 
-    server_url = get_server_url()
-    restantes = {}
+    server_url = get_server_url().rstrip("/")
+    sincronizados = set()
+    red_ok = True
 
-    for emp_id, payload in pendientes.items():
+    for emp_id, payload in list(pendientes.items()):
         try:
-            res = requests.post(f"{server_url}/empleados/enrolar", json=payload, timeout=5, verify=False)
-            if res.status_code in [200, 201]:
-                print(f"[OFFLINE ENROL SYNC] ✓ Enrolamiento subido (ID: {emp_id}, NFC: {payload.get('nfc', '')})")
+            res = requests.post(
+                f"{server_url}/empleados/enrolar",
+                json=payload,
+                timeout=5,
+                verify=False,
+            )
+            if res.status_code in (200, 201, 409):
+                sincronizados.add(emp_id)
+                print(
+                    f"[OFFLINE ENROL SYNC] ✓ Enrolamiento subido "
+                    f"(ID: {emp_id}, NFC: {payload.get('nfc', '')})"
+                )
             else:
-                restantes[emp_id] = payload
+                print(f"[OFFLINE ENROL SYNC] ⚠️ Servidor rechazó ID {emp_id}: HTTP {res.status_code}")
         except requests.exceptions.RequestException:
-            restantes[emp_id] = payload
+            red_ok = False
+            break
 
-    guardar_enrolamientos_pendientes_dict(restantes)
+    if sincronizados:
+        # Releer bajo lock para no borrar enrolamientos guardados mientras se sincronizaba
+        with ARCHIVOS_LOCK:
+            actuales = cargar_enrolamientos_pendientes()
+            for emp_id in sincronizados:
+                actuales.pop(emp_id, None)
+            guardar_enrolamientos_pendientes_dict(actuales)
+
+    return red_ok
 
 
 def sincronizar_marcaciones_pendientes():
-    """Envía al servidor todas las marcaciones acumuladas localmente en modo offline."""
-    pendientes = leer_marcaciones_pendientes()
+    """
+    Envía al servidor todas las marcaciones acumuladas localmente en modo offline.
+    Retorna True si el servidor respondió (o no había pendientes), False si hubo fallo de red.
+    """
+    with ARCHIVOS_LOCK:
+        pendientes = leer_marcaciones_pendientes()
     if not pendientes:
-        return
+        return True
 
-    server_url = get_server_url()
-    restantes = []
+    server_url = get_server_url().rstrip("/")
+    sincronizadas = set()
+    red_ok = True
 
-    for idx, m in enumerate(pendientes):
+    for m in pendientes:
         fecha_real = m.get("Fecha_Hora", "")
         nfc_val = normalizar_uid_nfc(m.get("NFC_UID", ""))
+        nota_orig = m.get("Nota", "")
+        es_permiso_admin = "Permiso Administrador" in nota_orig
+
         payload = {
             "empleado_id": m["Empleado_ID"],
             "nfc": nfc_val,
@@ -77,19 +141,39 @@ def sincronizar_marcaciones_pendientes():
             "tipo_marcacion": m["Tipo_Marcacion"],
             "fecha_hora": fecha_real,
             "timestamp": fecha_real,
-            "nota": f"{m.get('Nota', '')} (Sincronizado Offline)".strip(),
+            "permiso_admin": es_permiso_admin,
+            "nota": f"{nota_orig} (Sincronizado Offline)".strip(),
         }
         try:
-            res = requests.post(f"{server_url}/marcaciones", json=payload, timeout=5, verify=False)
-            if res.status_code in [200, 201]:
-                print(f"[OFFLINE SYNC] ✓ Marcación enviada (ID: {m['Empleado_ID']}, Hora: {fecha_real})")
+            res = requests.post(
+                f"{server_url}/marcaciones",
+                json=payload,
+                timeout=5,
+                verify=False,
+            )
+            if res.status_code in (200, 201, 409):
+                sincronizadas.add(_clave_marcacion(m))
+                print(
+                    f"[OFFLINE SYNC] ✓ Marcación enviada "
+                    f"(ID: {m['Empleado_ID']}, Hora: {fecha_real})"
+                )
             else:
-                restantes.append(m)
+                print(
+                    f"[OFFLINE SYNC] ⚠️ Servidor rechazó marcación ID {m['Empleado_ID']}: "
+                    f"HTTP {res.status_code}"
+                )
         except requests.exceptions.RequestException:
-            restantes.extend(pendientes[idx:])
+            red_ok = False
             break
 
-    actualizar_marcaciones_pendientes(restantes)
+    if sincronizadas:
+        # Releer bajo lock para conservar cualquier marcación nueva guardada durante el envío
+        with ARCHIVOS_LOCK:
+            actuales = leer_marcaciones_pendientes()
+            restantes = [m for m in actuales if _clave_marcacion(m) not in sincronizadas]
+            actualizar_marcaciones_pendientes(restantes)
+
+    return red_ok
 
 
 def sincronizar_empleados_servidor():
@@ -99,13 +183,13 @@ def sincronizar_empleados_servidor():
        sin borrar colaboradores locales ni tarjetas NFC ya registradas.
     """
     inicializar_entorno()
-    server_url = get_server_url()
+    server_url = get_server_url().rstrip("/")
     sincronizar_enrolamientos_pendientes()
 
     try:
         res = requests.get(f"{server_url}/empleados", timeout=6, verify=False)
         if res.status_code == 200:
-            data = res.json()
+            data = _safe_json(res)
 
             with ARCHIVOS_LOCK:
                 emps_previos = cargar_empleados_locales()
@@ -132,19 +216,25 @@ def sincronizar_empleados_servidor():
                     vec_srv = info_srv.get("vector_facial", [])
                     vec_prev = prev.get("vector_facial", [])
                     vector_final = (
-                        vec_srv if (isinstance(vec_srv, list) and len(vec_srv) == 128)
+                        vec_srv
+                        if (isinstance(vec_srv, list) and len(vec_srv) == 128)
                         else vec_prev
                     )
 
                     empleados_dict[emp_id] = {
                         "nombre": info_srv.get("nombre") or prev.get("nombre", ""),
                         "apellido": info_srv.get("apellido") or prev.get("apellido", ""),
-                        "area": info_srv.get("area") or info_srv.get("departamento") or prev.get("area", "OPERACIONES"),
+                        "area": (
+                            info_srv.get("area")
+                            or info_srv.get("departamento")
+                            or prev.get("area", "OPERACIONES")
+                        ),
                         "nfc": nfc_val,
                         "rfid": nfc_val,
                         "vector_facial": vector_final if isinstance(vector_final, list) else [],
                     }
 
+                # Aplicar enrolamientos aún pendientes por encima para no perder cambios locales
                 for emp_id, pend in cargar_enrolamientos_pendientes().items():
                     prev = empleados_dict.get(emp_id, {})
                     nfc_pend = extraer_nfc_de_info(pend) or extraer_nfc_de_info(prev)
@@ -156,10 +246,16 @@ def sincronizar_empleados_servidor():
                         "area": pend.get("area") or prev.get("area", "OPERACIONES"),
                         "nfc": nfc_pend,
                         "rfid": nfc_pend,
-                        "vector_facial": vec_pend if (isinstance(vec_pend, list) and len(vec_pend) == 128) else vec_prev,
+                        "vector_facial": (
+                            vec_pend
+                            if (isinstance(vec_pend, list) and len(vec_pend) == 128)
+                            else vec_prev
+                        ),
                     }
 
-                contador_nfc = sum(1 for info in empleados_dict.values() if extraer_nfc_de_info(info))
+                contador_nfc = sum(
+                    1 for info in empleados_dict.values() if extraer_nfc_de_info(info)
+                )
                 guardar_empleados_locales(empleados_dict)
                 reconstruir_mapa_nfc_local(empleados_dict)
 
@@ -179,13 +275,50 @@ def sincronizar_empleados_servidor():
             print(f"[SYNC] {msg}")
             return True, msg
 
-        registrar_log_incidente("SISTEMA", "SINCRONIZACION", "Error HTTP Servidor", f"Código {res.status_code}")
+        registrar_log_incidente(
+            "SISTEMA", "SINCRONIZACION", "Error HTTP Servidor", f"Código {res.status_code}"
+        )
         return False, f"⚠️ Respuesta del servidor HTTP {res.status_code}"
 
     except requests.exceptions.RequestException as e:
         reconstruir_mapa_nfc_local(cargar_empleados_locales())
         registrar_log_incidente("SISTEMA", "SINCRONIZACION", "Servidor Inalcanzable", str(e))
         return False, f"❌ Sin conexión con el servidor REST ({server_url}). Modo Offline activo."
+
+
+def sincronizar_todo(descargar_empleados=True):
+    """
+    Orquestador seguro (thread-safe) de sincronización bidireccional:
+    1. Sube enrolamientos pendientes.
+    2. Sube marcaciones pendientes.
+    3. Descarga y fusiona empleados del servidor (si descargar_empleados=True).
+    Retorna True si el servidor estuvo accesible, False si sigue offline.
+    """
+    if not SYNC_LOCK.acquire(blocking=False):
+        return True  # Ya hay una sincronización en curso
+
+    try:
+        enrol_ok = sincronizar_enrolamientos_pendientes()
+        marc_ok = sincronizar_marcaciones_pendientes()
+        if not (enrol_ok and marc_ok):
+            return False
+
+        if descargar_empleados:
+            emp_ok, _ = sincronizar_empleados_servidor()
+            return emp_ok
+
+        return True
+    finally:
+        SYNC_LOCK.release()
+
+
+def _disparar_sync_async(descargar_empleados=False):
+    """Lanza sincronización en segundo plano sin bloquear la UI."""
+    threading.Thread(
+        target=sincronizar_todo,
+        kwargs={"descargar_empleados": descargar_empleados},
+        daemon=True,
+    ).start()
 
 
 # ----------------------------------------------------------------------
@@ -195,7 +328,7 @@ def obtener_vector_biometrico(identificador):
     """
     Busca al colaborador por ID de empleado o UID de tarjeta NFC:
     1. Revisa empleados.json local, enrolamientos_pendientes.json y base_rostros/<ID>.npy.
-    2. Si no está localmente, consulta al Servidor REST en tiempo real.
+    2. Si no está localmente, consulta al Servidor REST en tiempo real (probando UID normal e invertido).
     """
     inicializar_entorno()
     identificador_limpio = normalizar_uid_nfc(identificador)
@@ -249,46 +382,48 @@ def obtener_vector_biometrico(identificador):
                 return True, emp_id_real, depto, vector_np, "✓ Vector restaurado desde empleados.json local"
 
     # Consultar al Servidor REST en tiempo real si no está en local
-    server_url = get_server_url()
-    try:
-        res = requests.get(f"{server_url}/empleados/{identificador_limpio}", timeout=4, verify=False)
-        if res.status_code == 200:
-            data = res.json()
-            real_id = str(data.get("empleado_id") or data.get("id") or identificador_limpio).strip().upper()
-            depto = data.get("area") or data.get("departamento") or "OPERACIONES"
-            nfc_val = extraer_nfc_de_info(data) or (identificador_limpio if real_id != identificador_limpio else "")
-            vector_list = data.get("vector_facial", [])
+    server_url = get_server_url().rstrip("/")
+    for cand in candidatos:
+        try:
+            res = requests.get(f"{server_url}/empleados/{cand}", timeout=4, verify=False)
+            if res.status_code == 200:
+                data = _safe_json(res)
+                real_id = str(data.get("empleado_id") or data.get("id") or cand).strip().upper()
+                depto = data.get("area") or data.get("departamento") or "OPERACIONES"
+                nfc_val = extraer_nfc_de_info(data) or (cand if real_id != cand else "")
+                vector_list = data.get("vector_facial", [])
 
-            if isinstance(vector_list, list) and len(vector_list) == 128:
-                vector_np = np.array(vector_list, dtype=np.float64)
+                if isinstance(vector_list, list) and len(vector_list) == 128:
+                    vector_np = np.array(vector_list, dtype=np.float64)
 
-                with ARCHIVOS_LOCK:
-                    emps = cargar_empleados_locales()
-                    emps[real_id] = {
-                        "nombre": data.get("nombre", ""),
-                        "apellido": data.get("apellido", ""),
-                        "area": depto,
-                        "nfc": nfc_val,
-                        "rfid": nfc_val,
-                        "vector_facial": vector_list,
-                    }
-                    guardar_empleados_locales(emps)
-                    reconstruir_mapa_nfc_local(emps)
-                    np.save(os.path.join(DIR_ROSTROS, f"{real_id}.npy"), vector_np)
+                    with ARCHIVOS_LOCK:
+                        emps = cargar_empleados_locales()
+                        emps[real_id] = {
+                            "nombre": data.get("nombre", ""),
+                            "apellido": data.get("apellido", ""),
+                            "area": depto,
+                            "nfc": nfc_val,
+                            "rfid": nfc_val,
+                            "vector_facial": vector_list,
+                        }
+                        guardar_empleados_locales(emps)
+                        reconstruir_mapa_nfc_local(emps)
+                        np.save(os.path.join(DIR_ROSTROS, f"{real_id}.npy"), vector_np)
 
-                return True, real_id, depto, vector_np, "✓ Biometría y NFC obtenidos desde Servidor"
+                    return True, real_id, depto, vector_np, "✓ Biometría y NFC obtenidos desde Servidor"
 
-            registrar_log_incidente(real_id, "BUSQUEDA_BIOMETRICA", "Vector Facial Inválido", "Menos de 128 valores")
-            return False, real_id, depto, None, f"⚠️ El ID {real_id} no tiene un vector facial válido."
+                registrar_log_incidente(real_id, "BUSQUEDA_BIOMETRICA", "Vector Facial Inválido", "Menos de 128 valores")
+                return False, real_id, depto, None, f"⚠️ El ID {real_id} no tiene un vector facial válido."
 
-        if res.status_code == 404:
-            registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Colaborador/NFC No Registrado", "404 Not Found")
-            return False, identificador_limpio, "", None, f"⚠️ La tarjeta o ID '{identificador_limpio}' no está registrado."
+            if res.status_code == 404:
+                continue
 
-    except requests.exceptions.RequestException as e:
-        registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Fallo Conexión Servidor", str(e))
+        except requests.exceptions.RequestException as e:
+            registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Fallo Conexión Servidor", str(e))
+            break
 
-    return False, identificador_limpio, "", None, f"❌ La tarjeta o ID '{identificador_limpio}' no fue encontrado."
+    registrar_log_incidente(identificador_limpio, "BUSQUEDA_BIOMETRICA", "Colaborador/NFC No Registrado", "404 Not Found")
+    return False, identificador_limpio, "", None, f"⚠️ La tarjeta o ID '{identificador_limpio}' no fue encontrado."
 
 
 def api_guardar_nuevo_empleado(emp_id, departamento, nfc_uid, vector_np):
@@ -319,7 +454,7 @@ def api_guardar_nuevo_empleado(emp_id, departamento, nfc_uid, vector_np):
         guardar_empleados_locales(emps)
         reconstruir_mapa_nfc_local(emps)
 
-    server_url = get_server_url()
+    server_url = get_server_url().rstrip("/")
     payload = {
         "empleado_id": emp_id_clean,
         "area": departamento,
@@ -331,23 +466,26 @@ def api_guardar_nuevo_empleado(emp_id, departamento, nfc_uid, vector_np):
 
     try:
         res = requests.post(f"{server_url}/empleados/enrolar", json=payload, timeout=5, verify=False)
-        if res.status_code in [200, 201]:
-            eliminar_enrolamiento_pendiente(emp_id_clean)
+        if res.status_code in (200, 201):
+            with ARCHIVOS_LOCK:
+                eliminar_enrolamiento_pendiente(emp_id_clean)
             return True, "✓ Colaborador y tarjeta NFC registrados localmente y en el servidor."
 
         registrar_log_incidente(emp_id_clean, "ENROLAMIENTO", "Error Respuesta Servidor", f"HTTP {res.status_code}")
-        guardar_enrolamiento_pendiente(emp_id_clean, departamento, nfc_clean, vector_list)
+        with ARCHIVOS_LOCK:
+            guardar_enrolamiento_pendiente(emp_id_clean, departamento, nfc_clean, vector_list)
         return True, "✓ Guardado localmente (⚠️ Servidor rechazó; se reintentará sincronizar)."
 
     except requests.exceptions.RequestException as e:
         registrar_log_incidente(emp_id_clean, "ENROLAMIENTO", "Servidor Inalcanzable Backup", str(e))
-        guardar_enrolamiento_pendiente(emp_id_clean, departamento, nfc_clean, vector_list)
+        with ARCHIVOS_LOCK:
+            guardar_enrolamiento_pendiente(emp_id_clean, departamento, nfc_clean, vector_list)
         return True, "✓ Guardado localmente con NFC (⚠️ Sin red; se subirá automáticamente al reconectar)."
 
 
 def api_registrar_marcacion(emp_id, tipo_marcacion, nota="", nfc_uid="", permiso_admin=False):
     """Registra la marcación con fecha/hora exacta en el servidor o en cola offline."""
-    server_url = get_server_url()
+    server_url = get_server_url().rstrip("/")
     fecha_hora_actual = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
     nfc_clean = normalizar_uid_nfc(nfc_uid)
 
@@ -374,41 +512,42 @@ def api_registrar_marcacion(emp_id, tipo_marcacion, nota="", nfc_uid="", permiso
 
     try:
         res = requests.post(f"{server_url}/marcaciones", json=payload, timeout=5, verify=False)
-        if res.status_code in [200, 201]:
-            data = res.json()
-            threading.Thread(target=sincronizar_enrolamientos_pendientes, daemon=True).start()
-            threading.Thread(target=sincronizar_marcaciones_pendientes, daemon=True).start()
+        data = _safe_json(res)
+        if res.status_code in (200, 201):
+            _disparar_sync_async(descargar_empleados=False)
             return True, data.get("mensaje", "Marcación registrada exitosamente")
 
-        err_msg = res.json().get("error", f"Error HTTP {res.status_code}")
+        err_msg = data.get("error", f"Error HTTP {res.status_code}")
         registrar_log_incidente(emp_id, tipo_marcacion, "Rechazo del Servidor", err_msg)
-        guardar_marcacion_pendiente(
-            emp_id,
-            tipo_marcacion,
-            fecha_hora_actual,
-            f"{nota} (Servidor Rechazó: {err_msg})",
-            nfc_uid=nfc_clean,
-        )
+        with ARCHIVOS_LOCK:
+            guardar_marcacion_pendiente(
+                emp_id,
+                tipo_marcacion,
+                fecha_hora_actual,
+                f"{nota} (Servidor Rechazó: {err_msg})",
+                nfc_uid=nfc_clean,
+            )
         return True, f"✓ Marcación ({fecha_hora_actual}) guardada LOCALMENTE (Servidor Rechazó)"
 
     except requests.exceptions.RequestException as e:
         registrar_log_incidente(emp_id, tipo_marcacion, "Fallo Red Marcación", str(e))
-        guardar_marcacion_pendiente(
-            emp_id,
-            tipo_marcacion,
-            fecha_hora_actual,
-            f"{nota} (Red Caída)",
-            nfc_uid=nfc_clean,
-        )
+        with ARCHIVOS_LOCK:
+            guardar_marcacion_pendiente(
+                emp_id,
+                tipo_marcacion,
+                fecha_hora_actual,
+                f"{nota} (Red Caída)",
+                nfc_uid=nfc_clean,
+            )
         return True, f"✓ Marcación ({fecha_hora_actual}) guardada LOCALMENTE (Servidor Fuera de Línea)"
 
 
 def api_obtener_historial(emp_id):
-    server_url = get_server_url()
+    server_url = get_server_url().rstrip("/")
     try:
         res = requests.get(f"{server_url}/historial/{emp_id}", timeout=5, verify=False)
         if res.status_code == 200:
-            return res.json().get("historial", [])
+            return _safe_json(res).get("historial", [])
         return []
     except Exception:
         return []
@@ -416,20 +555,22 @@ def api_obtener_historial(emp_id):
 
 def probar_conexion_servidor(base_url):
     """Prueba conectividad HTTP contra los endpoints conocidos del servidor."""
-    endpoints = [
-        f"{base_url}/api/ping",
-        f"{base_url}/api",
-        f"{base_url}/api/empleados",
-        f"{base_url}/api/marcaciones",
-        f"{base_url}/",
-    ]
+    base = base_url.rstrip("/")
+    if base.endswith("/api"):
+        endpoints = [f"{base}/ping", f"{base}/empleados", f"{base}/marcaciones", base]
+    else:
+        endpoints = [
+            f"{base}/api/ping",
+            f"{base}/api",
+            f"{base}/api/empleados",
+            f"{base}/api/marcaciones",
+            f"{base}/",
+        ]
     for target_url in endpoints:
         try:
             res = requests.get(target_url, timeout=3, verify=False)
-            if res.status_code in [200, 201, 400, 404, 405]:
+            if res.status_code in (200, 201, 400, 404, 405):
                 return True, f"✅ ¡Conexión con el Servidor Establecida! (HTTP {res.status_code})"
-        except requests.exceptions.ConnectionError:
-            continue
-        except Exception:
+        except requests.exceptions.RequestException:
             continue
     return False, ""

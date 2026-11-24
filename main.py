@@ -19,9 +19,8 @@ from storage import (
     reconstruir_mapa_nfc_local,
 )
 from api_client import (
-    sincronizar_enrolamientos_pendientes,
-    sincronizar_marcaciones_pendientes,
-    sincronizar_empleados_servidor,
+    servidor_disponible,
+    sincronizar_todo,
 )
 from nfc_reader import GestorNFC
 from biometria import worker_reconocimiento
@@ -125,23 +124,45 @@ class SistemaMarcacionApp(tk.Tk):
     def _loop_sincronizacion_periodica(self):
         """
         Ciclo en segundo plano:
-        - Sube enrolamientos y marcaciones offline pendientes cada 30 segundos.
-        - Fusiona empleados desde el servidor cada 1 hora sin borrar registros locales.
+        - Detecta cuando el servidor pasa de OFFLINE -> ONLINE y ejecuta de inmediato
+          una sincronización bidireccional completa (sube pendientes y descarga empleados).
+        - Mientras está ONLINE, sube pendientes cada 30 segundos y descarga empleados
+          periódicamente según INTERVALO_SYNC_SEGUNDOS.
         """
-        contador_segundos = 0
+        estaba_offline = True
+        ultimo_sync_empleados = 0.0
+
         while self.sync_activa:
             try:
-                sincronizar_enrolamientos_pendientes()
-                sincronizar_marcaciones_pendientes()
+                online = servidor_disponible(timeout=3)
 
-                if contador_segundos % INTERVALO_SYNC_SEGUNDOS == 0:
-                    sincronizar_empleados_servidor()
+                if online:
+                    ahora = time.monotonic()
+                    necesita_descarga = (
+                        estaba_offline
+                        or (ahora - ultimo_sync_empleados) >= INTERVALO_SYNC_SEGUNDOS
+                    )
+
+                    if estaba_offline:
+                        print("[SYNC] 🟢 Servidor detectado en línea. Iniciando sincronización bidireccional...")
+
+                    sync_ok = sincronizar_todo(descargar_empleados=necesita_descarga)
+                    if sync_ok:
+                        estaba_offline = False
+                        if necesita_descarga:
+                            ultimo_sync_empleados = ahora
+                    else:
+                        estaba_offline = True
+                else:
+                    if not estaba_offline:
+                        print("[SYNC] 🔴 Servidor fuera de línea. Modo Offline activo.")
+                    estaba_offline = True
 
             except Exception as e:
                 print(f"[SYNC LOOP ERROR] {e}")
+                estaba_offline = True
 
             time.sleep(30)
-            contador_segundos += 30
 
     def show_frame(self, page_name):
         self.gestor_nfc.detener_escucha()

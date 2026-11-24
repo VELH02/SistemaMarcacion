@@ -918,19 +918,19 @@ class PantallaBiometrica(tk.Frame):
         self.controller.admin_override_nfc = False
 
         if accion in ["ENTRADA", "SALIDA", "TIEMPO EXTRA"]:
-            ok, mensaje_servidor = api_registrar_marcacion(
-                emp_id, accion, nfc_uid=nfc_uid, permiso_admin=es_override
+            self.lbl_status.config(
+                text=f"✓ PERSONA VERIFICADA ({similitud:.1f}%)\nRegistrando marcación...",
+                fg=COLOR_PRIMARY,
             )
-            if ok:
-                self.lbl_status.config(
-                    text=f"✓ PERSONA VERIFICADA ({similitud:.1f}%)\n{mensaje_servidor}",
-                    fg=COLOR_PRIMARY,
-                )
-            else:
-                self.lbl_status.config(text=mensaje_servidor, fg=COLOR_DANGER)
-
             self.btn_cancelar.pack_forget()
-            self.after(2000, lambda: self.controller.show_frame("PantallaPrincipal"))
+
+            def _enviar():
+                ok, mensaje_servidor = api_registrar_marcacion(
+                    emp_id, accion, nfc_uid=nfc_uid, permiso_admin=es_override
+                )
+                self.after(0, lambda: self._finalizar_marcacion(similitud, ok, mensaje_servidor))
+
+            threading.Thread(target=_enviar, daemon=True).start()
 
         elif accion == "MARCACIONES":
             self.lbl_status.config(
@@ -940,6 +940,17 @@ class PantallaBiometrica(tk.Frame):
             self.btn_cancelar.pack_forget()
             self.after(1200, lambda: self.controller.show_frame("PantallaHistorial"))
 
+    def _finalizar_marcacion(self, similitud, ok, mensaje_servidor):
+        if ok:
+            self.lbl_status.config(
+                text=f"✓ PERSONA VERIFICADA ({similitud:.1f}%)\n{mensaje_servidor}",
+                fg=COLOR_PRIMARY,
+            )
+        else:
+            self.lbl_status.config(text=mensaje_servidor, fg=COLOR_DANGER)
+
+        self.after(2000, lambda: self.controller.show_frame("PantallaPrincipal"))
+        
     def detener_camara(self):
         self.is_running = False
         if self.cap is not None:
