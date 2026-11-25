@@ -1,0 +1,50 @@
+ALICAPSA - CLIENTE PORTÁTIL PARA WINDOWS 10 DE 32 BITS
+
+1. Copie o extraiga la carpeta completa ALICAPSA_Cliente_Win10_x86 a un disco
+   local de la pantalla, en una carpeta donde el usuario tenga permiso de escritura.
+   No ejecute dentro del ZIP. No copie solamente los archivos EXE: _internal es necesario.
+   No necesita instalar Python, pip ni Visual Studio en la pantalla.
+
+2. Con el cliente cerrado, abra Configurar_Cliente.exe. Confirme la dirección
+   del servidor y elija su PIN administrativo de 6 a 8 dígitos. Al cambiarlo después
+   se solicita el PIN actual. No se entrega un PIN compartido predeterminado.
+   Si existe la variable ALICAPSA_ADMIN_PIN, esa variable tiene prioridad.
+
+3. Abra ALICAPSA_Cliente.exe. El servidor debe estar encendido y accesible desde
+   esta pantalla. La primera sincronización descarga los colaboradores y su biometría.
+   Los colaboradores deben haber sido registrados previamente en el servidor.
+
+4. Conecte la cámara y el lector NFC. El lector necesita su controlador compatible
+   con Windows 10 x86 y el servicio de Tarjeta inteligente/PC-SC de Windows.
+   Antes de usar el terminal para asistencia real, pruebe una entrada, una salida,
+   la verificación facial/parpadeo y su recepción en el servidor con personal autorizado.
+   La autoprueba de compilación no certifica la cámara ni el lector físicos de destino.
+
+DATOS QUE DEBEN CONSERVARSE
+
+datos/config.json: dirección, credencial privada del terminal y PIN protegido.
+datos/terminal.sqlite3: diario de marcaciones y su estado de envío.
+datos/empleados.json: catálogo local descargado del servidor.
+datos/logs/cliente.log: diagnóstico del cliente, con rotación de archivos.
+
+Para respaldar, cierre el cliente y copie la carpeta datos completa.
+Para actualizar el programa, conserve esa carpeta datos. No la sustituya por
+la de otro terminal y no borre marcaciones pendientes.
+
+Para instalar OTRO terminal, utilice una copia nueva de esta entrega antes de
+ejecutarla. Esta entrega no incluye terminal.sqlite3 ni historiales de empleados:
+cada equipo generará su propia identidad y su propio diario.
+
+La carpeta contiene una credencial privada que autoriza el terminal ante el
+servidor de ALICAPSA. No publique el ZIP ni config.json en sitios públicos.
+
+DIAGNÓSTICO
+
+Si no inicia, consulte datos/logs/cliente.log y entregue ese diagnóstico a TI.
+La aplicación solo permite una instancia por carpeta de datos.
+La interfaz de marcación mantiene su diseño y no abre una consola de comandos.
+AUTOPRUEBA_COMPILACION.json registra las verificaciones del ejecutable x86
+en el equipo de compilación. VERSIONES.json y SHA256SUMS.txt identifican la entrega.
+
+Opcional para TI (no genera marcaciones reales ni se comunica con el servidor):
+ALICAPSA_Cliente.exe --autoprueba resultado.json
