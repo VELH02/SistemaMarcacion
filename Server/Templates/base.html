@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Alicapsa - Sistema de Asistencia</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #184828;
+            --primary-hover: #10331C;
+            --accent-color: #48A731;
+            --bg-light: #F3F6F4;
+        }
+
+        body {
+            background-color: var(--bg-light);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            padding-bottom: 2rem;
+        }
+
+        /* Navbar institucional (Fondo blanco, texto y bordes verdes) */
+        .navbar-custom {
+            background-color: #FFFFFF;
+            border-bottom: 3px solid var(--primary-color);
+            position: relative;
+            /* Por encima del aviso sticky (1020), por debajo de los modales. */
+            z-index: 1021;
+        }
+
+        .navbar-custom .navbar-nav {
+            align-items: center;
+        }
+
+        .navbar-custom .nav-item {
+            white-space: nowrap; /* Evita que los textos se rompan en 2 líneas */
+        }
+
+        .navbar-custom .nav-link {
+            color: var(--primary-color);
+            font-weight: 600;
+            white-space: nowrap;
+            padding: 0.5rem 0.8rem;
+            transition: color 0.2s;
+        }
+
+        .navbar-custom .nav-link:hover {
+            color: var(--accent-color);
+        }
+
+        .btn-custom {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-custom:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        .card-header-custom {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        .clock-badge {
+            background-color: #EAF5EC;
+            border: 1px solid #D3DFD6;
+            color: var(--primary-color);
+            white-space: nowrap;
+        }
+        .navbar-custom .navbar-collapse { min-width: 0; }
+        .navbar-custom .navbar-nav { flex-wrap: wrap; gap: .15rem; }
+        .navbar-custom .navbar-nav > li:first-child { white-space: normal; overflow-wrap: anywhere; max-width: 16rem; }
+        .navbar-custom .dropdown-menu { min-width: min(14rem, calc(100vw - 3rem)); }
+        @media (max-width: 1399.98px) {
+            .navbar-custom .navbar-collapse { flex-basis: 100%; padding-top: .75rem; }
+            .navbar-custom .navbar-nav { align-items: stretch; }
+            .navbar-custom .nav-link { white-space: normal; }
+            .navbar-custom .nav-item { margin-left: 0 !important; margin-right: 0 !important; }
+            .navbar-custom .dropdown-menu { width: 100%; position: static; }
+        }
+        @media (min-width: 1400px) {
+            .navbar-custom .navbar-nav { justify-content: flex-end; }
+            .navbar-custom .nav-link { padding: .5rem .5rem; }
+        }
+    </style>
+</head>
+<body>
+
+<nav class="navbar navbar-expand-xxl navbar-custom mb-4 shadow-sm py-2">
+    <div class="container-fluid px-3">
+        <!-- Logo (Sin filtro invertido para que mantenga su color real) -->
+        <a class="navbar-brand d-flex align-items-center py-0 me-3" href="/">
+            <img src="{{ url_for('static', filename='logo.png') }}" alt="Alicapsa" height="45" class="d-inline-block">
+        </a>
+
+        <!-- Reloj NTP -->
+        <div class="d-none d-md-flex align-items-center clock-badge rounded-pill px-3 py-1 me-auto shadow-sm">
+            <span id="reloj-hora" class="fw-bold font-monospace fs-6 text-dark">--:--:--</span>
+            <span class="text-muted mx-2">|</span>
+            <span id="reloj-fecha" class="text-muted small">--/--/----</span>
+        </div>
+
+        {% if session.get('usuario') %}
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Abrir menú de navegación">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item me-3 text-muted small d-flex align-items-center">
+                    Área: <strong class="ms-1 fs-6 text-dark">{{ session.get('area') }}</strong>
+                </li>
+                
+                {% if rol_actual in ('admin','coordinador') %}
+                <li class="nav-item"><a class="nav-link" href="/">Asistencias</a></li>
+                <li class="nav-item"><a class="nav-link" href="/planificacion">Semana</a></li>
+                <li class="nav-item"><a class="nav-link" href="/aprobaciones">Validaciones</a></li>
+                <li class="nav-item"><a class="nav-link" href="/bono">Bono mensual</a></li>
+                {% endif %}
+                {% if rol_actual in ('admin','rrhh','coordinador') %}
+                <li class="nav-item"><a class="nav-link" href="/colaboradores">Colaboradores</a></li>
+                {% endif %}
+                <li class="nav-item"><a class="nav-link" href="/turnos">Turnos</a></li>
+                {% if rol_actual=='admin' %}
+                <li class="nav-item dropdown">
+                    <button class="nav-link dropdown-toggle border-0 bg-transparent" type="button" data-bs-toggle="dropdown" aria-expanded="false">Administración</button>
+                    <ul class="dropdown-menu dropdown-menu-end">
+                        <li><a class="dropdown-item" href="/rrhh/calendario">Calendario</a></li>
+                        <li><a class="dropdown-item" href="/admin/areas">Áreas</a></li>
+                        <li><a class="dropdown-item" href="/admin/usuarios">Usuarios</a></li>
+                        <li><a class="dropdown-item" href="/admin/conceptos">Conceptos</a></li>
+                        <li><a class="dropdown-item" href="/consola">Consola</a></li>
+                        <li><a class="dropdown-item" href="/config">Configuración</a></li>
+                    </ul>
+                </li>
+                {% endif %}
+                <li class="nav-item ms-2">
+                    <a class="btn btn-sm btn-outline-danger px-3 rounded-pill fw-bold shadow-sm" href="/logout">Salir</a>
+                </li>
+            </ul>
+        </div>
+        {% endif %}
+    </div>
+</nav>
+
+<div class="container-fluid px-4">
+    {% if demo_actual %}<div class="alert alert-warning" role="status"><strong>Modo demostración · Datos simulados.</strong>
+        Período {{ demo_actual.desde }} al {{ demo_actual.hasta }} · Evaluación: {{ demo_actual.evaluado_al.replace('T',' ') }}.
+        No utilizar estos datos para pagar salarios.</div>{% endif %}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show shadow-sm" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    {% block content %}{% endblock %}
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function actualizarRelojBase() {
+        const ahora = new Date();
+        const opcionesHora = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
+        const opcionesFecha = { day: '2-digit', month: '2-digit', year: 'numeric' };
+        
+        document.getElementById('reloj-hora').innerText = ahora.toLocaleTimeString('es-PA', opcionesHora);
+        document.getElementById('reloj-fecha').innerText = ahora.toLocaleDateString('es-PA', opcionesFecha);
+    }
+    if (document.getElementById('reloj-hora')) {
+        setInterval(actualizarRelojBase, 1000);
+        actualizarRelojBase();
+    }
+</script>
+{% if session.get('usuario') %}<script src="{{ url_for('static',filename='save-all.js') }}" defer></script>{% endif %}
+</body>
+</html>

@@ -1,0 +1,74 @@
+ALICAPSA - SERVIDOR PORTÁTIL WINDOWS x64
+
+1. Extraiga o copie TODA esta carpeta a un disco local del servidor, por ejemplo:
+   C:\ALICAPSA\Servidor
+   No ejecute dentro del ZIP. Conserve _internal y data junto al ejecutable.
+   No requiere instalar Python ni copiar el venv. No coloque la DB activa en
+   una carpeta sincronizada por OneDrive ni en una unidad de red.
+
+2. Ejecute ALICAPSA_Servidor.exe. Mantenga su ventana abierta mientras se use
+   el sistema. Para detener de forma ordenada, use Ctrl+C y espere su cierre.
+   El equipo debe permanecer encendido y sin suspensión durante las marcaciones.
+
+3. Abra http://127.0.0.1:5000/ en ese equipo (o el puerto mostrado en consola).
+   En otros equipos use http://IP_DEL_SERVIDOR:5000/.
+   Configure los clientes con http://IP_DEL_SERVIDOR:5000/api.
+   TI debe permitir el puerto TCP de escucha en el firewall de la red privada.
+   Si el servidor anterior ocupa ese puerto, deténgalo antes de iniciar este EXE.
+   Solo se admite una instancia del servidor por equipo, incluso si se intenta
+   abrir desde otra carpeta o con otro puerto. La segunda avisa y se cierra.
+   Al cerrar o terminar el proceso, Windows libera automáticamente el bloqueo.
+   Use una dirección IP estable o reserva DHCP para evitar cambiar los clientes.
+
+BASE DE DATOS Y USUARIOS
+Se incluye una copia consistente de la base activa al compilar, con sus usuarios,
+colaboradores, turnos, marcaciones y credencial de terminal. Ingrese con sus
+usuarios habituales. Es una fotografía de ese momento: no recibe automáticamente
+los cambios posteriores de la base del proyecto. No ejecute dos servidores
+independientes como si compartieran la misma base de datos.
+
+Archivo predeterminado: data\alicapsa.sqlite3
+Si se incluye alicapsa_demo_*.db, es la base alternativa para presentaciones.
+La original es la predeterminada; la demostración no recibe marcaciones reales.
+El paquete contiene datos y credenciales privados; guárdelo con acceso restringido.
+
+Administración > Configuración > Base de datos SQLite permite seleccionar otra
+DB existente. Seleccione su ruta ABSOLUTA en este equipo, guarde y reinicie.
+La selección queda en data\database_location.json. Si la DB seleccionada está
+dentro de esta carpeta, podrá mover toda la carpeta y la ruta se ajustará.
+Si está fuera, su ruta sigue siendo absoluta. Una base seleccionada inexistente
+impide iniciar; el EXE no crea una nómina vacía como reemplazo.
+
+RESPALDOS
+En la web, utilice el respaldo de Administración. Incluye la base activa completa.
+También puede usar en PowerShell, desde esta carpeta:
+  .\ALICAPSA_Servidor.exe administrar check
+  .\ALICAPSA_Servidor.exe administrar backup
+Los respaldos se guardan en backups. Para especificar un archivo nuevo:
+  .\ALICAPSA_Servidor.exe administrar backup --output C:\Respaldos\alicapsa.db
+No sobrescriba respaldos previos. Conserve una copia en otro disco seguro.
+Para restaurar, detenga el servidor y seleccione o reemplace la base con un
+respaldo verificado. No reemplace una DB mientras esté abierta.
+
+CLIENTES
+Si cambió a una DB con otra credencial, genere un perfil:
+  .\ALICAPSA_Servidor.exe administrar client-profile
+Se genera perfiles\config_cliente.json; contiene una credencial privada.
+Actualice su dirección de servidor antes de usarlo en el cliente y conserve las
+otras opciones del terminal. No copie ni reemplace su terminal.sqlite3 para esto.
+
+OTRAS OPCIONES
+  .\ALICAPSA_Servidor.exe --port 5000 --threads 4
+  .\ALICAPSA_Servidor.exe --autoprueba C:\Temp\resultado_servidor.json
+La autoprueba usa una copia temporal, un puerto libre y empleados de prueba.
+No modifica data\alicapsa.sqlite3. No prueba el firewall ni terminales físicos.
+Los registros operativos se guardan en logs\servidor.log.
+
+ACTUALIZACIONES
+Esta es una carpeta nueva de entrega. Para actualizar una instalación en uso,
+respalde y detenga el servidor. Conserve data, backups, logs y perfiles de esa
+instalación; reemplace solo EXE y _internal con la nueva versión compatible.
+No sobrescriba la DB en uso con la fotografía de datos incluida en otra entrega.
+
+Validado automáticamente en Windows 11 x64. El paquete usa Python 3.13 x64;
+la validación en la máquina de destino y la jornada piloto siguen pendientes.

@@ -1,0 +1,961 @@
+{
+  "base": "C:\\Users\\duddy\\OneDrive\\Desktop\\SistemaMarcacion\\Server\\data\\alicapsa_demo_2026_11_09_30.db",
+  "desde": "2026-11-09",
+  "hasta": "2026-11-30",
+  "evaluado_al": "2026-12-01T12:00:00",
+  "colaboradores": 7,
+  "marcaciones_simuladas": 254,
+  "jornadas_completas": 125,
+  "ausencias": 9,
+  "jornadas_con_he": 7,
+  "jornadas_con_tardanza": 7,
+  "jornadas_para_revision": 4,
+  "domingos_trabajados": 2,
+  "casos": [
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-D",
+      "escenario": "Ausencia 310"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-D",
+      "escenario": "2 horas extra aprobadas"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-D",
+      "escenario": "Tardanza de 10 minutos"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal; faltante de 2 horas"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-001",
+      "nombre": "Pedro Martinez",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-D",
+      "escenario": "Tardanza de 20 minutos"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-N",
+      "escenario": "Ausencia 730"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-N",
+      "escenario": "1.5 horas extra aprobadas"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-N",
+      "escenario": "Tardanza de 10 minutos"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-N",
+      "escenario": "2 horas extra pendientes"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "EMP-002",
+      "nombre": "Maria Gomez",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-D",
+      "escenario": "Tardanza de 15 minutos"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-D",
+      "escenario": "Tardanza de 20 minutos"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal; faltante de 1 horas"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-D",
+      "escenario": "Falta marcar salida"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-22",
+      "turno": "DEMO-D",
+      "escenario": "Domingo: 8 horas base y 2 HE pendientes"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-D",
+      "escenario": "2 horas extra aprobadas"
+    },
+    {
+      "empleado_id": "14244",
+      "nombre": "Edwin Aponte",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-D",
+      "escenario": "Ausencia pendiente de código del coordinador"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-15",
+      "turno": "DEMO-D",
+      "escenario": "Domingo: 4 horas reales y mínimo de 8 por convenio"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-D",
+      "escenario": "Salida sin entrada; requiere ajuste del coordinador"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14340",
+      "nombre": "Eduin Er Malo",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-N",
+      "escenario": "Tardanza de 10 minutos; faltante de 0.5 horas"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-N",
+      "escenario": "Ausencia 750"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-N",
+      "escenario": "Tardanza de 12 minutos"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-N",
+      "escenario": "1 horas extra aprobadas"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "14250",
+      "nombre": "Eduin Er Bueno",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-N",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-D",
+      "escenario": "1 horas extra pendientes"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-D",
+      "escenario": "Falta marcar salida"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-D",
+      "escenario": "Ausencia 730"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-D",
+      "escenario": "Ausencia pendiente de código del coordinador"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-D",
+      "escenario": "Salida sin entrada; requiere ajuste del coordinador"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "3128",
+      "nombre": "Yaqui La buena",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-09",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-10",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-11",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-12",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-13",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-14",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-16",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-17",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-18",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-19",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-20",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-21",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-23",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-24",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-25",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-26",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-27",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-28",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    },
+    {
+      "empleado_id": "963",
+      "nombre": "Colaborador 963 ese mismo",
+      "fecha": "2026-11-30",
+      "turno": "DEMO-D",
+      "escenario": "Asistencia normal"
+    }
+  ]
+}
